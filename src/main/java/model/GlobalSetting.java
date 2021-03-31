@@ -1,9 +1,18 @@
 package model;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "global_settings")
 public class GlobalSetting {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; //id настройки
+
     private String code; //системное имя настройки
+
     private String name; //название настройки
+
     private String value; //значение настройки
 
     public Integer getId() {

@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,6 @@ public class User {
     private String password; //хэш пароля пользователя
     private String code; //код для восстановления пароля
     private String photo; //фотография (ссылка на файл)
-
 
     public Integer getId() {
         return id;

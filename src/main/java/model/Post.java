@@ -1,23 +1,33 @@
 package model;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "posts")
 public class Post {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id поста
+
+    @Column(name = "is_active")
     private int isActive; //скрыта или активна публикация: 0 или 1
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
     private ModerationStatus moderationStatus; //статус модерации, по умолчанию значение "NEW"
 
+    @Column(name = "moderator_id")
     private int moderatorId; //ID пользователя-модератора, принявшего решение
-    private int userId; //автор поста
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private User user; //автор поста
+
     private Date time; //дата и время публикации поста
     private String title; //заголовок поста
     private String text; //текст поста
+
+    @Column(name = "view_count")
     private int viewCount; //количество просмотров поста
 
     public int getId() {
@@ -52,12 +62,12 @@ public class Post {
         this.moderatorId = moderatorId;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Date getTime() {

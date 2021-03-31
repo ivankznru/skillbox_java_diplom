@@ -20,6 +20,12 @@
         <property name="hbm2ddl.auto">update</property>
 
         <mapping class="model.User"/>
-
+        <mapping class="model.Post"/>
+        <mapping class="model.PostVote"/>
+        <mapping class="model.Tag"/>
+        <mapping class="model.Tag2Post"/>
+        <mapping class="model.PostComment"/>
+        <mapping class="model.CaptchaCode"/>
+        <mapping class="model.GlobalSetting"/>
     </session-factory>
 </hibernate-configuration>

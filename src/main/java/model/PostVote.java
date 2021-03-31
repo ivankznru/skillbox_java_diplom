@@ -1,12 +1,23 @@
 package model;
 
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "post_votes")
 public class PostVote {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id лайка/дизлайка
-    private int userId; //тот, кто поставил лайк / дизлайк
-    private int postId; //пост, которому поставлен лайк / дизлайк
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private User user; //тот, кто поставил лайк / дизлайк
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Post post; //пост, которому поставлен лайк / дизлайк
+
     private Date time; //дата и время лайка / дизлайка
+
     private int value; //лайк или дизлайк: 1 или -1
 
     public int getId() {
@@ -17,20 +28,20 @@ public class PostVote {
         this.id = id;
     }
 
-    public int getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setUserId(User user) {
+        this.user = user;
     }
 
-    public int getPostId() {
-        return postId;
+    public Post getPost() {
+        return post;
     }
 
-    public void setPostId(int postId) {
-        this.postId = postId;
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public Date getTime() {

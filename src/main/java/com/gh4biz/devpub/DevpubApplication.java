@@ -1,5 +1,6 @@
 package com.gh4biz.devpub;
 
+import model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -27,9 +28,9 @@ public class DevpubApplication {
                 .build();
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-
+        User user = session.get(User.class, 1);
+        System.out.println(user.getName());
         SpringApplication.run(DevpubApplication.class, args);
-
         transaction.commit();
         sessionFactory.close();
     }
