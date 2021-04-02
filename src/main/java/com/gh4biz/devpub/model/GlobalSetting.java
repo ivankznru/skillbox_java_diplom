@@ -1,4 +1,4 @@
-package model;
+package com.gh4biz.devpub.model;
 
 import javax.persistence.*;
 

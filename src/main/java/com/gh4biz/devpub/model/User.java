@@ -1,4 +1,4 @@
-package model;
+package com.gh4biz.devpub.model;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -6,6 +6,11 @@ import java.util.Date;
 @Entity
 @Table(name = "users")
 public class User {
+    public User(Integer id, Integer isModerator) {
+        this.id = id;
+        this.isModerator = isModerator;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id; //id пользователя

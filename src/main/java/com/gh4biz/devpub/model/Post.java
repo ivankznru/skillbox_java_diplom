@@ -1,4 +1,4 @@
-package model;
+package com.gh4biz.devpub.model;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -26,6 +26,12 @@ public class Post {
     private Date time; //дата и время публикации поста
     private String title; //заголовок поста
     private String text; //текст поста
+    private String announce; //текст анонса без HTML-тэгов
+
+    private int likeCount;
+
+    private int dislikeCount;
+    private int commentCount;
 
     @Column(name = "view_count")
     private int viewCount; //количество просмотров поста
@@ -100,5 +106,21 @@ public class Post {
 
     public void setViewCount(int viewCount) {
         this.viewCount = viewCount;
+    }
+
+    public String getAnnounce() {
+        return announce;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public int getDislikeCount() {
+        return dislikeCount;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
     }
 }
