@@ -1,7 +1,10 @@
 package com.gh4biz.devpub.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "tag2post")
 public class Tag2Post {
@@ -15,27 +18,4 @@ public class Tag2Post {
     @ManyToOne(cascade = CascadeType.ALL)
     private Tag tag; //id тэга
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public Tag getTag() {
-        return tag;
-    }
-
-    public void setTag(Tag tag) {
-        this.tag = tag;
-    }
 }

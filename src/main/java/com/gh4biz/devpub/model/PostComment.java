@@ -1,8 +1,11 @@
 package com.gh4biz.devpub.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "post_comments")
 public class PostComment {
@@ -21,53 +24,7 @@ public class PostComment {
 
     private Date time; //дата и время комментария
 
+    @Column(columnDefinition = "TEXT")
     private String text; //текст комментария
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Post getParent() {
-        return parent;
-    }
-
-    public void setParent(Post parent) {
-        this.parent = parent;
-    }
-
-    public Post getPost() {
-        return post;
-    }
-
-    public void setPostId(Post post) {
-        this.post = post;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
 }

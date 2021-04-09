@@ -1,7 +1,10 @@
 package com.gh4biz.devpub.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "tags")
 public class Tag {
@@ -11,19 +14,4 @@ public class Tag {
 
     private String name; //текст тэга
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

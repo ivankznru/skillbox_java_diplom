@@ -1,10 +1,13 @@
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL57Dialect
 spring.datasource.url: jdbc:mysql://192.168.20.19:3306/devpub?characterEncoding=utf8
 spring.datasource.username: skilluser
 spring.datasource.password: testTEST667+667
-spring.jpa.hibernate.ddl-auto: none
+spring.jpa.hibernate.ddl-auto: validate
+spring.jpa.show-sql: false
+
 blog.title: GhDevPub
 blog.subtitle: Рассказы разработчиков
-blog.phone: +7 812 244-54-32
+blog.phone: +7 (812) 244-54-32
 blog.email: vkotov@vfemail.net
 blog.copyright: Gh Ltd.
 blog.copyrightfrom: 2021
