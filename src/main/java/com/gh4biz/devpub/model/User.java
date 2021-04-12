@@ -1,5 +1,6 @@
 package com.gh4biz.devpub.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class User {
     private Integer id; //id пользователя
 
     @Column(name = "is_moderator")
+    @JsonProperty("moderation")
     private Integer isModerator; //является ли пользователь модератором (может ли править глобальные настройки сайта и модерировать посты)
 
     @Column(name = "reg_time")
@@ -32,4 +34,7 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String photo; //фотография (ссылка на файл)
 
+    public User() {
+
+    }
 }

@@ -32,13 +32,6 @@ public class Post {
     @Column(columnDefinition = "TEXT")
     private String text; //текст поста
 
-    //private String announce; //текст анонса без HTML-тэгов
-
-//    private int likeCount;
-
-//    private int dislikeCount;
-//    private int commentCount;
-
     @Column(name = "view_count")
     private int viewCount; //количество просмотров поста
 
