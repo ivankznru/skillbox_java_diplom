@@ -11,7 +11,5 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id тэга
-
     private String name; //текст тэга
-
 }

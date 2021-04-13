@@ -44,8 +44,8 @@ public class ApiGeneralController {
         return ResponseEntity.ok(settingsService.getGlobalSettings());
     }
 
-    @GetMapping("/tag")
-    private ResponseEntity<TagResponse> tagResponse(){
-        return ResponseEntity.ok(new TagResponse());
-    }
+//    @GetMapping("/tag")
+//    private ResponseEntity<TagResponse> tagResponse(){
+//        return ResponseEntity.ok(new TagResponse());
+//    }
 }
