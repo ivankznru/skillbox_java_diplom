@@ -33,9 +33,8 @@ public class ApiTagController {
 
     @GetMapping("/tag")
     private ResponseEntity<TagResponse> tagResponse(HttpServletRequest request) {
-//        String offset = request.getParameter("offset");
-//        String limit = request.getParameter("limit");
-//        String mode = request.getParameter("mode");
+        String query = request.getParameter("query");
+
         Iterable<Tag2Post> tag2PostIterable = tag2PostRepository.findAll();
         HashMap<String, Integer> tagsHashMap = new HashMap<>();
 

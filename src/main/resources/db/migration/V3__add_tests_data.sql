@@ -99,3 +99,15 @@ INSERT INTO tag2post(post_id, tag_id) VALUES (8, 8);
 INSERT INTO tag2post(post_id, tag_id) VALUES (9, 7);
 INSERT INTO tag2post(post_id, tag_id) VALUES (10, 1);
 INSERT INTO tag2post(post_id, tag_id) VALUES (11, 2);
+
+INSERT INTO post_votes(id, user_id, post_id, time, value) VALUES ('1', 2, 1, '2021-04-11 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 3, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 4, '2021-04-13 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 5, '2021-04-14 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 1, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 2, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 4, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 1, '2021-04-14 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 2, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 3, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 5, '2021-04-14 18:09:07', '1');
