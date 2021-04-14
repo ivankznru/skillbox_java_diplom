@@ -1,6 +1,5 @@
 package com.gh4biz.devpub.api.response;
 
-import com.gh4biz.devpub.model.Post;
 import com.gh4biz.devpub.model.Post4Response;
 import lombok.Data;
 

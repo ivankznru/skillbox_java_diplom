@@ -1,10 +1,8 @@
 package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.api.response.PostResponse;
-import com.gh4biz.devpub.model.Post;
-import com.gh4biz.devpub.model.Post4Response;
-import com.gh4biz.devpub.model.PostVote;
-import com.gh4biz.devpub.model.User4Response;
+import com.gh4biz.devpub.model.*;
+import com.gh4biz.devpub.repo.PostCommentsRepository;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +20,16 @@ import java.util.List;
 public class ApiPostController {
     private PostRepository postRepository;
     private PostVotesRepository postVotesRepository;
+    private PostCommentsRepository postCommentsRepository;
     private final int ANNOUNCE_TEXT_LIMIT = 150;
+    private int activePostsCount;
 
-    public ApiPostController(PostRepository postRepository, PostVotesRepository postVotesRepository) {
+    public ApiPostController(PostRepository postRepository,
+                             PostVotesRepository postVotesRepository,
+                             PostCommentsRepository postCommentsRepository) {
         this.postRepository = postRepository;
         this.postVotesRepository = postVotesRepository;
+        this.postCommentsRepository = postCommentsRepository;
     }
 
     @GetMapping("/post")
@@ -36,9 +39,10 @@ public class ApiPostController {
         String mode = request.getParameter("mode");
 
         PostResponse postResponse = new PostResponse();
-        postResponse.setCount(limit);
+
 
         postResponse.setPosts(getPosts(offset, limit, mode));
+        postResponse.setCount(activePostsCount);
         return ResponseEntity.ok(postResponse);
     }
 
@@ -47,20 +51,17 @@ public class ApiPostController {
         ArrayList<Post> activePostList = new ArrayList<>();
 
         for (Post post : postIterable) {
-            if (post.getIsActive() == 1) {
+            if (post.getIsActive() == 1) { // 1 - соответсвует статусу активный
                 activePostList.add(post);
             }
         }
 
-        postIterable.forEach(activePostList::add);
-
         ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
-        int activePostsCount = activePostList.size();
+        activePostsCount = activePostList.size();
 
         int i = offset;
         while (post4ResponseList.size() < Math.min(offset + limit, activePostsCount)) {
             Post post = activePostList.get(i);
-
             int id = post.getId();
             Date date = post.getTime();
             long timestamp = date.getTime() / 1000;
@@ -75,11 +76,13 @@ public class ApiPostController {
 
             int likeCount = getVoteCount(post)[0];
             int dislikeCount = getVoteCount(post)[1];
-            int commentCount = 0;
+            int commentCount = getCommentsCount(post);
             int viewCount = post.getViewCount();
 
-            post4ResponseList.add(new Post4Response(id, timestamp, user, title, announce, likeCount, dislikeCount, commentCount, viewCount));
+            post4ResponseList.add(new Post4Response(id, timestamp, user, title, announce,
+                    likeCount, dislikeCount, commentCount, viewCount));
             i++;
+            if (i == activePostsCount) break;
         }
 
         return post4ResponseList;
@@ -104,4 +107,19 @@ public class ApiPostController {
         }
         return new int[]{likeCount, dislikeCount};
     }
+
+    private int getCommentsCount(Post post) {
+        Iterable<PostComment> postCommentIterable = postCommentsRepository.findAll();
+        ArrayList<PostComment> postCommentList = new ArrayList<>();
+
+        for (PostComment comment : postCommentIterable) {
+            if (comment.getPost().getId() == post.getId()) {
+                postCommentList.add(comment);
+            }
+        }
+
+        return postCommentList.size();
+    }
+
+
 }
