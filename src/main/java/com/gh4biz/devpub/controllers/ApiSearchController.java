@@ -11,75 +11,59 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.TreeSet;
 
 @RestController
 @RequestMapping("/api")
-public class ApiPostController {
+public class ApiSearchController {
     private PostRepository postRepository;
     private PostVotesRepository postVotesRepository;
     private PostCommentsRepository postCommentsRepository;
-    int postsCount;
 
-    public ApiPostController(PostRepository postRepository,
-                             PostVotesRepository postVotesRepository,
-                             PostCommentsRepository postCommentsRepository) {
+    private final String regex = "[\\.,\\s!;?:\"']+";
+    ArrayList<SearchTree> searchTreeArrayList = new ArrayList<>();
+
+    public ApiSearchController(PostRepository postRepository,
+                               PostVotesRepository postVotesRepository,
+                               PostCommentsRepository postCommentsRepository) {
         this.postRepository = postRepository;
         this.postVotesRepository = postVotesRepository;
         this.postCommentsRepository = postCommentsRepository;
     }
 
-    @GetMapping("/post")
-    private ResponseEntity<PostResponse> postResponse(HttpServletRequest request) {
+    @GetMapping("/post/search")
+    private ResponseEntity<PostResponse> searchResponse(HttpServletRequest request) {
         int offset = Integer.parseInt(request.getParameter("offset"));
         int limit = Integer.parseInt(request.getParameter("limit"));
-        String mode = request.getParameter("mode");
+        String query = request.getParameter("query").replaceAll(regex, "");
         Iterable<Post> postIterable = postRepository.findAll();
-        PostResponse postResponse = new PostResponse();
-        postResponse.setPosts(getPosts(postIterable, offset, limit, mode));
+        if (offset == 0)
+            searchIndex(postIterable);
 
-        postsCount = getPostsCount(postIterable);
-        postResponse.setCount(postsCount);
-        return ResponseEntity.ok(postResponse);
+        PostResponse searchResponse = new PostResponse();
+        ArrayList<Post4Response> posts = getPosts(query);
+        searchResponse.setCount(posts.size());
+        ArrayList<Post4Response> responses = new ArrayList<>();
+        for (int i = offset; i <Math.min(limit, posts.size()); i++){
+            responses.add(posts.get(i));
+        }
+        searchResponse.setPosts(responses);
+        return ResponseEntity.ok(searchResponse);
     }
 
-    private ArrayList<Post4Response> getPosts(Iterable<Post> postIterable, int offset, int limit, String mode) {
+    private ArrayList<Post4Response> getPosts(String query) {
         ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
-
-        int iterationCounter = 0;
-        for (Post post : postIterable) {
-            if (iterationCounter < offset) {
-                iterationCounter++;
+        for (SearchTree searchTree : searchTreeArrayList) {
+            Post post = searchTree.getPost();
+            if (!searchTree.getText().contains(query)) {
                 continue;
-            }
-            if (post4ResponseList.size() >= limit) {
-                break;
             }
             int likeCount = getVoteCount(post, "like");
             int dislikeCount = getVoteCount(post, "dislike");
             int commentCount = getCommentsCount(post);
+            long sort = post.getTime().getTime();
 
-            long sort = 0;
-            switch (mode) {
-                case "best": {
-                    if (likeCount > 0) {
-                        sort = likeCount;
-                    } else {
-                        continue;
-                    }
-                    break;
-                }
-                case "popular": {
-                    if (commentCount > 0) {
-                        sort = commentCount;
-                    } else
-                        continue;
-                    break;
-                }
-                case "recent": {
-                    sort = post.getTime().getTime();
-                }
-            }
             int ANNOUNCE_TEXT_LIMIT = 150;
             post4ResponseList.add(new Post4Response(post.getId(),
                     post.getTime().getTime() / 1000,
@@ -92,22 +76,26 @@ public class ApiPostController {
                             .concat("..."),
                     likeCount,
                     dislikeCount,
-                    getCommentsCount(post),
+                    commentCount,
                     post.getViewCount(), sort));
-            iterationCounter++;
         }
         return post4ResponseList;
     }
 
-    private int getPostsCount(Iterable<Post> postIterable) {
-        int activePostsCount = 0;
+    private void searchIndex(Iterable<Post> postIterable) {
+        searchTreeArrayList.clear();
         for (Post post : postIterable) {
-            int STATUS_ACTIVE = 1;
-            if (post.getIsActive() == STATUS_ACTIVE) {
-                activePostsCount++;
+            String[] fragments = post.getTitle().split(regex);
+            TreeSet<String> tree = new TreeSet<>();
+            for (String fragment : fragments) {
+                tree.add(fragment);
             }
+            fragments = post.getText().split(regex);
+            for (String fragment : fragments) {
+                tree.add(fragment);
+            }
+            searchTreeArrayList.add(new SearchTree(post, tree));
         }
-        return activePostsCount;
     }
 
     private int getVoteCount(Post post, String vote) {

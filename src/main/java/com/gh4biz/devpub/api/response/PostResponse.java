@@ -8,7 +8,5 @@ import java.util.List;
 @Data
 public class PostResponse {
     private int count;
-    private int offset;
-    private String mode;
     private List<Post4Response> posts;
 }

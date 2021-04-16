@@ -26,7 +26,7 @@ public class SettingsService {
                 if (set.getValue().equals("YES")){
                     settingsResponse.setMultiuserMode(true);
                 }
-                if (set.equals("NO")){
+                if (set.getValue().equals("NO")){
                     settingsResponse.setMultiuserMode(false);
                 }
             }
@@ -34,7 +34,7 @@ public class SettingsService {
                 if (set.getValue().equals("YES")){
                     settingsResponse.setPostPremoderation(true);
                 }
-                if (set.equals("NO")){
+                if (set.getValue().equals("NO")){
                     settingsResponse.setPostPremoderation(false);
                 }
             }
@@ -42,7 +42,7 @@ public class SettingsService {
                 if (set.getValue().equals("YES")){
                     settingsResponse.setStatisticsIsPublic(true);
                 }
-                if (set.equals("NO")){
+                if (set.getValue().equals("NO")){
                     settingsResponse.setStatisticsIsPublic(false);
                 }
             }
