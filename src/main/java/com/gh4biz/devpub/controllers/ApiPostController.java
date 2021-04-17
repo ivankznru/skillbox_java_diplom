@@ -19,7 +19,10 @@ public class ApiPostController {
     private PostRepository postRepository;
     private PostVotesRepository postVotesRepository;
     private PostCommentsRepository postCommentsRepository;
+    private final int ANNOUNCE_TEXT_LIMIT = 150;
     int postsCount;
+    private final String regex = "[\\.,\\s!;?:\"']+";
+    ArrayList<SearchTree> searchTreeArrayList = new ArrayList<>();
 
     public ApiPostController(PostRepository postRepository,
                              PostVotesRepository postVotesRepository,
@@ -41,6 +44,69 @@ public class ApiPostController {
         postsCount = getPostsCount(postIterable);
         postResponse.setCount(postsCount);
         return ResponseEntity.ok(postResponse);
+    }
+
+    @GetMapping("/post/search")
+    private ResponseEntity<PostResponse> searchResponse(HttpServletRequest request) {
+        int offset = Integer.parseInt(request.getParameter("offset"));
+        int limit = Integer.parseInt(request.getParameter("limit"));
+        String query = request.getParameter("query").replaceAll(regex, "");
+        Iterable<Post> postIterable = postRepository.findAll();
+        if (offset == 0)
+            searchIndex(postIterable);
+
+        PostResponse searchResponse = new PostResponse();
+        ArrayList<Post4Response> posts = getSearch(query);
+        searchResponse.setCount(posts.size());
+        ArrayList<Post4Response> responses = new ArrayList<>();
+        for (int i = offset; i <Math.min(limit, posts.size()); i++){
+            responses.add(posts.get(i));
+        }
+        searchResponse.setPosts(responses);
+        return ResponseEntity.ok(searchResponse);
+    }
+
+    private ArrayList<Post4Response> getSearch(String query) {
+        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        for (SearchTree searchTree : searchTreeArrayList) {
+            Post post = searchTree.getPost();
+            if (!searchTree.getText().contains(query.toLowerCase())) {
+                continue;
+            }
+            int likeCount = getVoteCount(post, "like");
+            int dislikeCount = getVoteCount(post, "dislike");
+            int commentCount = getCommentsCount(post);
+            long sort = post.getTime().getTime();
+
+            post4ResponseList.add(new Post4Response(post.getId(),
+                    post.getTime().getTime() / 1000,
+                    new User4Response(
+                            post.getUser().getId(),
+                            post.getUser().getName()),
+                    post.getTitle(),
+                    post.getText().substring // анонс
+                            (0, Math.min(ANNOUNCE_TEXT_LIMIT, post.getText().length()))
+                            .concat("..."),
+                    likeCount,
+                    dislikeCount,
+                    commentCount,
+                    post.getViewCount(), sort));
+        }
+        return post4ResponseList;
+    }
+
+    private void searchIndex(Iterable<Post> postIterable) {
+        searchTreeArrayList.clear();
+        for (Post post : postIterable) {
+            String text =
+                    post.getTitle().concat(" ").concat(post.getText());
+            String[] fragments = text.split(regex);
+            TreeSet<String> tree = new TreeSet<>();
+            for (String fragment : fragments) {
+                tree.add(fragment.toLowerCase());
+            }
+            searchTreeArrayList.add(new SearchTree(post, tree));
+        }
     }
 
     private ArrayList<Post4Response> getPosts(Iterable<Post> postIterable, int offset, int limit, String mode) {
@@ -80,7 +146,7 @@ public class ApiPostController {
                     sort = post.getTime().getTime();
                 }
             }
-            int ANNOUNCE_TEXT_LIMIT = 150;
+            //int ANNOUNCE_TEXT_LIMIT = 150;
             post4ResponseList.add(new Post4Response(post.getId(),
                     post.getTime().getTime() / 1000,
                     new User4Response(
