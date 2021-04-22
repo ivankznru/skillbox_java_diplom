@@ -23,7 +23,7 @@ VALUES ('1', 'NEW', 1, 2, '2021-04-09 18:01:07', 'Мысли о северной
         '3');
 
 insert into posts(is_active, status, moderator_id, user_id, time, title, text, view_count)
-VALUES ('1', 'NEW', 1, 1, '2021-04-10 18:01:07', 'Spring Boot - возвращение JSON с массивом объектов',
+VALUES ('0', 'NEW', 1, 1, '2021-04-10 18:01:07', 'Spring Boot - возвращение JSON с массивом объектов',
         ' Используя этот ответ в качестве подсказки, я разработал контроллер Spring Boot для /greetings чтобы вернуть приветствие на разных языках в JSON. Пока я получаю вывод в нужном формате (массив объектов), не могли бы вы дать мне знать, если есть лучший способ? ', '2');
 
 insert into posts(is_active, status, moderator_id, user_id, time, title, text, view_count)
@@ -70,6 +70,9 @@ VALUES ('1', 'NEW', 1, 2, '2021-04-11 18:09:07', 'Адаптация подхо�
 
 INSERT INTO post_comments(id, parent_id, post_id, user_id, time, text) VALUES ('1',NULL,1,2,'2021-04-10 10:57:07','согласен с предыдущим оратором');
 INSERT INTO post_comments(parent_id, post_id, user_id, time, text) VALUES (NULL,2,1,'2021-04-10 11:00:07','согласен с предыдущим оратором');
+INSERT INTO post_comments(parent_id, post_id, user_id, time, text) VALUES (NULL,2,1,'2021-04-19 17:48:07','согласен с предыдущим оратором 2');
+INSERT INTO post_comments(parent_id, post_id, user_id, time, text) VALUES (NULL,3,1,'2021-04-20 15:40:07','не согласен с предыдущим оратором');
+
 INSERT INTO tags(id, name) VALUES ('1','java');
 INSERT INTO tags(name) VALUES ('спб');
 INSERT INTO tags(name) VALUES ('vw');
@@ -101,13 +104,35 @@ INSERT INTO tag2post(post_id, tag_id) VALUES (10, 1);
 INSERT INTO tag2post(post_id, tag_id) VALUES (11, 2);
 
 INSERT INTO post_votes(id, user_id, post_id, time, value) VALUES ('1', 2, 1, '2021-04-11 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 3, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 4, '2021-04-13 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 5, '2021-04-14 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 1, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 2, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 4, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 1, '2021-04-14 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 6, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 7, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (1, 5, '2021-04-14 18:09:07', '1');
+
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 3, '2021-04-12 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 4, '2021-04-13 18:09:07', '-1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 5, '2021-04-14 18:09:07', '-1');
-INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 1, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 1, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 2, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 4, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 1, '2021-04-14 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 2, '2021-04-12 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 9, '2021-04-13 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (2, 5, '2021-04-14 18:09:07', '1');
+
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 3, '2021-04-12 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 4, '2021-04-13 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 5, '2021-04-14 18:09:07', '-1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 10, '2021-04-12 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 2, '2021-04-12 18:09:07', '-1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (3, 4, '2021-04-13 18:09:07', '1');
-INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 1, '2021-04-14 18:09:07', '1');
+INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 8, '2021-04-14 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 2, '2021-04-12 18:09:07', '-1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 3, '2021-04-13 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 5, '2021-04-14 18:09:07', '1');
