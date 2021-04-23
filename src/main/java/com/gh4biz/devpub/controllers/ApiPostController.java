@@ -5,6 +5,7 @@ import com.gh4biz.devpub.model.*;
 import com.gh4biz.devpub.repo.PostCommentsRepository;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
+import com.gh4biz.devpub.repo.Tag2PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -24,6 +25,7 @@ public class ApiPostController {
     private PostRepository postRepository;
     private PostVotesRepository postVotesRepository;
     private PostCommentsRepository postCommentsRepository;
+    private Tag2PostRepository tag2PostRepository;
     private final int ANNOUNCE_TEXT_LIMIT = 150;
     private final int LIKE_VALUE = 1;
     private final int DISLIKE_VALUE = -1;
@@ -31,10 +33,12 @@ public class ApiPostController {
 
     public ApiPostController(PostRepository postRepository,
                              PostVotesRepository postVotesRepository,
-                             PostCommentsRepository postCommentsRepository) {
+                             PostCommentsRepository postCommentsRepository,
+                             Tag2PostRepository tag2PostRepository) {
         this.postRepository = postRepository;
         this.postVotesRepository = postVotesRepository;
         this.postCommentsRepository = postCommentsRepository;
+        this.tag2PostRepository = tag2PostRepository;
     }
 
     @GetMapping("/post")
@@ -88,6 +92,27 @@ public class ApiPostController {
             post4ResponseList.add(convert2Post4Response(post));
         }
         return ResponseEntity.ok(new PostsResponse(post4ResponseList.size(), post4ResponseList));
+    }
+
+    @GetMapping("/post/byTag")
+    private ResponseEntity<PostsResponse> postsResponseByTag(
+            @RequestParam int offset,
+            @RequestParam int limit,
+            @RequestParam String tag) {
+
+        String tag2resp = "%".concat(tag).concat("%");
+        ArrayList<Integer> posts =
+                tag2PostRepository.getPosts(
+                        tag2resp,
+                        PageRequest.of(offset / limit, limit));
+
+        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        for (Integer postId : posts) {
+            Post post = postRepository.findPostsById(postId);
+            post4ResponseList.add(convert2Post4Response(post));
+        }
+        int count = tag2PostRepository.countTagPosts(tag2resp);
+        return ResponseEntity.ok(new PostsResponse(count, post4ResponseList));
     }
 
     private PostsResponse popularPosts(int offset, int limit) {
