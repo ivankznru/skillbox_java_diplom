@@ -17,6 +17,9 @@ public class Post4Response implements Comparable<Post4Response>{
     int viewCount;
     long sort;
 
+    public Post4Response() {
+    }
+
     @Override
     public int compareTo(Post4Response post4Response) {
         if (getSort() > post4Response.getSort()){
