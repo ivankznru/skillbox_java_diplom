@@ -23,5 +23,4 @@ public class PostVote {
 
     @Column(columnDefinition = "TINYINT")
     private int value; //лайк или дизлайк: 1 или -1
-
 }

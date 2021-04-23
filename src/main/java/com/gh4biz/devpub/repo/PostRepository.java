@@ -29,6 +29,12 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     @Query("SELECT DISTINCT year(time) FROM Post AS year GROUP BY year")
     ArrayList<Integer> getYears();
 
-    @Query("SELECT id FROM Post WHERE year(time) = ?1 and month(time) = ?2 and day(time) = ?3 order by time desc")
+    @Query("SELECT id FROM Post WHERE isActive = 1 and year(time) = ?1 and month(time) = ?2 and day(time) = ?3 order by time desc")
     ArrayList<Integer> getPostsByDate(int year, int month, int day, Pageable pageable);
+
+    @Query("SELECT id FROM Post WHERE isActive = 1 and (text LIKE ?1 or title LIKE ?1) order by time desc")
+    Page<Integer> getPostsBySearch(String search, Pageable pageable);
+
+    @Query("SELECT count(*) FROM Post WHERE isActive = 1 and (text LIKE ?1 or title LIKE ?1) order by time desc")
+    int countSearchPosts(String query);
 }

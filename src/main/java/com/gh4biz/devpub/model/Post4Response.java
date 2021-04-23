@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Post4Response implements Comparable<Post4Response>{
+public class Post4Response{
     int id;
     long timestamp;
     User4Response user; // id, name
@@ -15,19 +15,19 @@ public class Post4Response implements Comparable<Post4Response>{
     int dislikeCount;
     int commentCount;
     int viewCount;
-    long sort;
+    //long sort;
 
     public Post4Response() {
     }
 
-    @Override
-    public int compareTo(Post4Response post4Response) {
-        if (getSort() > post4Response.getSort()){
-            return 1;
-        }
-        if (getSort() < post4Response.getSort()){
-            return -1;
-        }
-        return 0;
-    }
+//    @Override
+//    public int compareTo(Post4Response post4Response) {
+//        if (getSort() > post4Response.getSort()){
+//            return 1;
+//        }
+//        if (getSort() < post4Response.getSort()){
+//            return -1;
+//        }
+//        return 0;
+//    }
 }
