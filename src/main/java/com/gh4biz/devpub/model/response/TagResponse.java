@@ -1,7 +1,7 @@
-package com.gh4biz.devpub.api.response;
+package com.gh4biz.devpub.model.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.gh4biz.devpub.model.TagWeight;
+import com.gh4biz.devpub.model.response.TagWeight;
 import lombok.Data;
 
 import java.util.List;

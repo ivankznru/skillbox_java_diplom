@@ -1,5 +1,7 @@
-package com.gh4biz.devpub.model;
+package com.gh4biz.devpub.model.entity;
 
+import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.entity.Tag;
 import lombok.Data;
 
 import javax.persistence.*;

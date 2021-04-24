@@ -1,9 +1,9 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.api.response.TagResponse;
-import com.gh4biz.devpub.model.Post;
-import com.gh4biz.devpub.model.Tag2Post;
-import com.gh4biz.devpub.model.TagWeight;
+import com.gh4biz.devpub.model.response.TagResponse;
+import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.entity.Tag2Post;
+import com.gh4biz.devpub.model.response.TagWeight;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.Tag2PostRepository;
 import com.gh4biz.devpub.repo.TagRepository;

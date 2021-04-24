@@ -1,4 +1,4 @@
-package com.gh4biz.devpub.model;
+package com.gh4biz.devpub.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

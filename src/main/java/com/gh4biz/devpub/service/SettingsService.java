@@ -1,7 +1,7 @@
 package com.gh4biz.devpub.service;
 
-import com.gh4biz.devpub.api.response.SettingsResponse;
-import com.gh4biz.devpub.model.GlobalSettings;
+import com.gh4biz.devpub.model.response.SettingsResponse;
+import com.gh4biz.devpub.model.entity.GlobalSettings;
 import com.gh4biz.devpub.repo.GlobalSettingsRepository;
 import org.springframework.stereotype.Service;
 

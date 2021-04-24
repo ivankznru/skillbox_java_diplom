@@ -1,4 +1,4 @@
-package com.gh4biz.devpub.model;
+package com.gh4biz.devpub.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

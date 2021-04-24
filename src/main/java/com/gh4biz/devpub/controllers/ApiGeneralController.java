@@ -1,19 +1,13 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.api.response.*;
-import com.gh4biz.devpub.model.GlobalSettings;
-import com.gh4biz.devpub.repo.GlobalSettingsRepository;
+import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.service.CheckService;
 import com.gh4biz.devpub.service.SettingsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")

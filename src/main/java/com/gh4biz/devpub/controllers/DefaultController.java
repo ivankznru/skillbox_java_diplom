@@ -1,6 +1,6 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.api.response.InitResponse;
+import com.gh4biz.devpub.model.response.InitResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;

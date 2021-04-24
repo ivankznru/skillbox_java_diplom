@@ -1,6 +1,6 @@
-package com.gh4biz.devpub.api.response;
+package com.gh4biz.devpub.model.response;
 
-import com.gh4biz.devpub.model.User;
+import com.gh4biz.devpub.model.entity.User;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,6 @@
 package com.gh4biz.devpub.service;
 
-import com.gh4biz.devpub.api.response.CheckResponse;
-import com.gh4biz.devpub.model.User;
+import com.gh4biz.devpub.model.response.CheckResponse;
 import org.springframework.stereotype.Service;
 
 @Service

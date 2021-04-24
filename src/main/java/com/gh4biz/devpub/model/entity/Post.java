@@ -1,5 +1,6 @@
-package com.gh4biz.devpub.model;
+package com.gh4biz.devpub.model.entity;
 
+import com.gh4biz.devpub.model.response.ModerationStatus;
 import lombok.Data;
 
 import javax.persistence.*;

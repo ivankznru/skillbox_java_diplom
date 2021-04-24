@@ -1,6 +1,6 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.api.response.PostsByYearResponse;
+import com.gh4biz.devpub.model.response.PostsByYearResponse;
 import com.gh4biz.devpub.repo.PostRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

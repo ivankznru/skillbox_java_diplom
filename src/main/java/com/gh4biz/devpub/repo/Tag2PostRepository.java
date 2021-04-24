@@ -1,6 +1,6 @@
 package com.gh4biz.devpub.repo;
 
-import com.gh4biz.devpub.model.Tag2Post;
+import com.gh4biz.devpub.model.entity.Tag2Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

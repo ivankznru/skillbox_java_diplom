@@ -1,11 +1,11 @@
-package com.gh4biz.devpub.model;
+package com.gh4biz.devpub.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class User4Response {
+public class UserResponse {
     int id;
     String name;
 }

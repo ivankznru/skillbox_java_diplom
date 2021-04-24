@@ -1,6 +1,5 @@
-package com.gh4biz.devpub.api.response;
+package com.gh4biz.devpub.model.response;
 
-import com.gh4biz.devpub.model.Post4Response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,7 +9,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostsResponse {
     private int count;
-    private List<Post4Response> posts;
+    private List<PostAnnotationResponse> posts;
 
     public PostsResponse() {
     }

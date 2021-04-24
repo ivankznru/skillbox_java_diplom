@@ -78,7 +78,7 @@ INSERT INTO tags(name) VALUES ('спб');
 INSERT INTO tags(name) VALUES ('vw');
 INSERT INTO tags(name) VALUES ('antivirus');
 INSERT INTO tags(name) VALUES ('sql');
-INSERT INTO tags(name) VALUES ('sping');
+INSERT INTO tags(name) VALUES ('spring');
 INSERT INTO tags(name) VALUES ('python');
 INSERT INTO tags(name) VALUES ('Kubernets');
 INSERT INTO tags(name) VALUES ('Webix');

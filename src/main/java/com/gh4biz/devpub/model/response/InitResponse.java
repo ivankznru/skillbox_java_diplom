@@ -1,4 +1,4 @@
-package com.gh4biz.devpub.api.response;
+package com.gh4biz.devpub.model.response;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;

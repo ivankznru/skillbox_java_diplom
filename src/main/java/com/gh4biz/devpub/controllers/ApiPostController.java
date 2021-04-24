@@ -1,19 +1,21 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.api.response.PostsResponse;
-import com.gh4biz.devpub.model.*;
+import com.gh4biz.devpub.model.response.PostsResponse;
+import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.response.CommentCount;
+import com.gh4biz.devpub.model.response.PostAnnotationResponse;
+import com.gh4biz.devpub.model.response.UserResponse;
+import com.gh4biz.devpub.model.response.VoteCount;
 import com.gh4biz.devpub.repo.PostCommentsRepository;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
 import com.gh4biz.devpub.repo.Tag2PostRepository;
+import com.gh4biz.devpub.service.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -86,12 +88,12 @@ public class ApiPostController {
                 postRepository.getPostsByDate(year, month, day,
                         PageRequest.of(offset / limit, limit));
 
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         for (Integer postId : posts) {
             Post post = postRepository.findPostsById(postId);
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
-        return ResponseEntity.ok(new PostsResponse(post4ResponseList.size(), post4ResponseList));
+        return ResponseEntity.ok(new PostsResponse(postAnnotationResponseList.size(), postAnnotationResponseList));
     }
 
     @GetMapping("/post/byTag")
@@ -106,17 +108,25 @@ public class ApiPostController {
                         tag2resp,
                         PageRequest.of(offset / limit, limit));
 
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         for (Integer postId : posts) {
             Post post = postRepository.findPostsById(postId);
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
         int count = tag2PostRepository.countTagPosts(tag2resp);
-        return ResponseEntity.ok(new PostsResponse(count, post4ResponseList));
+        return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
+    }
+
+    @GetMapping("/post/{id}")
+    private ResponseEntity<PostsResponse> getPostById(
+            @PathVariable int id) {
+        Post post = PostService.getPostRepository().findPostsById(id);
+        System.out.println(post.getText());
+        return ResponseEntity.ok(new PostsResponse());
     }
 
     private PostsResponse popularPosts(int offset, int limit) {
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
 
         Slice<CommentCount> postCommentSlice =
                 postCommentsRepository.countTotalComments(
@@ -124,53 +134,53 @@ public class ApiPostController {
 
         for (CommentCount comment : postCommentSlice) {
             Post post = postRepository.findPostsById(comment.getId());
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
 
         return new PostsResponse(postCommentSlice.getContent().size(),
-                post4ResponseList);
+                postAnnotationResponseList);
     }
 
     private PostsResponse bestPosts(int offset, int limit) {
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         Slice<VoteCount> voteCounts = postVotesRepository.countTotalVote(
                 LIKE_VALUE,
                 PageRequest.of(offset / limit, limit)
         );
         for (VoteCount vote : voteCounts) {
             Post post = postRepository.findPostsById(vote.getId());
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
-        return new PostsResponse(voteCounts.getSize(), post4ResponseList);
+        return new PostsResponse(voteCounts.getSize(), postAnnotationResponseList);
     }
 
     private PostsResponse recentPosts(int offset, int limit) {
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         Slice<Post> posts = postRepository.findAllByIsActiveOrderByTimeDesc(
                 ACTIVE_POST_VALUE,
                 PageRequest.of(offset / limit, limit)
         );
         for (Post post : posts) {
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
         int count = postRepository.countAllByIsActive(ACTIVE_POST_VALUE);
-        return new PostsResponse(count, post4ResponseList);
+        return new PostsResponse(count, postAnnotationResponseList);
     }
 
     private PostsResponse earlyPosts(int offset, int limit) {
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         Slice<Post> posts = postRepository.findAllByIsActiveOrderByTimeAsc(
                 ACTIVE_POST_VALUE,
                 PageRequest.of(offset / limit, limit)
         );
         for (Post post : posts) {
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
-        return new PostsResponse(postRepository.countAllByIsActive(ACTIVE_POST_VALUE), post4ResponseList);
+        return new PostsResponse(postRepository.countAllByIsActive(ACTIVE_POST_VALUE), postAnnotationResponseList);
     }
 
     private PostsResponse getSearch(String query, int offset, int limit) {
-        ArrayList<Post4Response> post4ResponseList = new ArrayList<>();
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         String query4sql = "%".concat(query).concat("%");
         Page<Integer> posts = postRepository.getPostsBySearch(
                 query4sql,
@@ -178,16 +188,16 @@ public class ApiPostController {
         );
         for (Integer postId : posts) {
             Post post = postRepository.findPostsById(postId);
-            post4ResponseList.add(convert2Post4Response(post));
+            postAnnotationResponseList.add(convert2Post4Response(post));
         }
         int count = postRepository.countSearchPosts(query4sql);
-        return new PostsResponse(count, post4ResponseList);
+        return new PostsResponse(count, postAnnotationResponseList);
     }
 
-    private Post4Response convert2Post4Response(Post post) {
-        return new Post4Response(post.getId(),
+    private PostAnnotationResponse convert2Post4Response(Post post) {
+        return new PostAnnotationResponse(post.getId(),
                 post.getTime().getTime() / 1000,
-                new User4Response(
+                new UserResponse(
                         post.getUser().getId(),
                         post.getUser().getName()),
                 post.getTitle(),
