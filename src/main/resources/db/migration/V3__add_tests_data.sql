@@ -1,16 +1,16 @@
 insert into users(id, is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('1', '1', '2021-04-09 17:14:07', 'Vladimir', 'vkotov@vfemail.net', '123', '321', 'photo/vova');
+VALUES ('1', '1', '2021-04-09 17:14:07', 'Vladimir', 'vkotov@vfemail.net', '123', '321', 'C:/Users/admin/IdeaProjects/devpub/src/main/resources/avatars/ab/cd/ef/52461.jpg');
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-09 17:16:07', 'Petya', 'petya@vfemail.net', '123', '321', 'photo/petya');
+VALUES ('0', '2021-04-09 17:16:07', 'Petya', 'petya@vfemail.net', '123', '321', 'C:/Users/admin/IdeaProjects/devpub/src/main/resources/avatars/ab/cd/ef/52462.jpg');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-10 16:11:07', 'Denya', 'denya@vfemail.net', '123', '321', 'photo/denya');
+VALUES ('0', '2021-04-10 16:11:07', 'Denya', 'denya@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52463.jpg');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-11 17:16:07', 'Vasya', 'Vasya@vfemail.net', '123', '321', 'photo/vasya');
+VALUES ('0', '2021-04-11 17:16:07', 'Vasya', 'Vasya@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52464.jpg');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-12 16:10:07', 'Sasha', 'sasha@vfemail.net', '123', '321', 'photo/sasha');
+VALUES ('0', '2021-04-12 16:10:07', 'Sasha', 'sasha@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52465.jpg');
 
 insert into posts(id, is_active, status, moderator_id, user_id, time, title, text, view_count)
 VALUES ('1', '1', 'NEW', 1, 1, '2020-12-31 18:00:07', 'О миграции БД',

@@ -5,9 +5,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CommentResponse {
+public class UserWithPhotoResponse {
     private int id;
-    private long timestamp;
-    private String text;
-    private UserWithPhotoResponse user;
+    private String name;
+    private String photo; // "/avatars/ab/cd/ef/52461.jpg"
 }

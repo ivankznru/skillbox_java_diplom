@@ -1,11 +1,7 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.model.response.PostsResponse;
 import com.gh4biz.devpub.model.entity.Post;
-import com.gh4biz.devpub.model.response.CommentCount;
-import com.gh4biz.devpub.model.response.PostAnnotationResponse;
-import com.gh4biz.devpub.model.response.UserResponse;
-import com.gh4biz.devpub.model.response.VoteCount;
+import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.PostCommentsRepository;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
@@ -19,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api")
@@ -118,11 +114,11 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/{id}")
-    private ResponseEntity<PostsResponse> getPostById(
+    private ResponseEntity<PostResponse> getPostById(
             @PathVariable int id) {
         Post post = PostService.getPostRepository().findPostsById(id);
-        System.out.println(post.getText());
-        return ResponseEntity.ok(new PostsResponse());
+        PostResponse postResponse = new PostResponse(post);
+        return ResponseEntity.ok(postResponse);
     }
 
     private PostsResponse popularPosts(int offset, int limit) {
