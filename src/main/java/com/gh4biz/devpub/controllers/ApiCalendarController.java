@@ -31,8 +31,10 @@ public class ApiCalendarController {
         String strStart = year + "-01-01 00:00:00";  // Start date
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat sdf4response = new SimpleDateFormat("yyyy-MM-dd");
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
         LocalDate localDateStart = LocalDate.parse(strStart, formatter);
+
         Date dateStart = convertToDateViaInstant(localDateStart);
         Calendar c = Calendar.getInstance();
         c.setTime(sdf.parse(strStart));

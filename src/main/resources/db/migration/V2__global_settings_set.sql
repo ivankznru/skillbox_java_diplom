@@ -1,5 +1,5 @@
 insert into global_settings (id, code, name, value)
-values ('1', 'MULTIUSER_MODE', 'Многопользовательский режим', 'NO');
+values ('1', 'MULTIUSER_MODE', 'Многопользовательский режим', 'YES');
 
 insert into global_settings (code, name, value)
 values ('POST_PREMODERATION', 'Премодерация постов', 'NO');

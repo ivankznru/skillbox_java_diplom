@@ -1,16 +1,16 @@
 insert into users(id, is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('1', '1', '2021-04-09 17:14:07', 'Vladimir', 'vkotov@vfemail.net', '123', '321', 'C:/Users/admin/IdeaProjects/devpub/src/main/resources/avatars/ab/cd/ef/52461.jpg');
+VALUES ('1', '1', '2021-04-09 17:14:07', 'Vladimir', 'vkotov@vfemail.net', '123', '321', 'https://black.gh4biz.ru/index.php/apps/files_sharing/publicpreview/NnKybiYBdDBnz4y?x=1594&y=407&a=true&file=54319.jpg&scalingup=0');
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-09 17:16:07', 'Petya', 'petya@vfemail.net', '123', '321', 'C:/Users/admin/IdeaProjects/devpub/src/main/resources/avatars/ab/cd/ef/52462.jpg');
+VALUES ('0', '2021-04-09 17:16:07', 'Petya', 'petya@vfemail.net', '123', '321', 'https://black.gh4biz.ru/index.php/s/zFNTK329cb2fZek/preview');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-10 16:11:07', 'Denya', 'denya@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52463.jpg');
+VALUES ('0', '2021-04-10 16:11:07', 'Denya', 'denya@vfemail.net', '123', '321', 'https://black.gh4biz.ru/index.php/s/5y8Wo5XbnAnJxgW/preview');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-11 17:16:07', 'Vasya', 'Vasya@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52464.jpg');
+VALUES ('0', '2021-04-11 17:16:07', 'Vasya', 'Vasya@vfemail.net', '123', '321', 'https://black.gh4biz.ru/index.php/s/kPYzPY2ckYFKZbj/preview');
 
 insert into users(is_moderator, reg_time, name, email, password, code, photo)
-VALUES ('0', '2021-04-12 16:10:07', 'Sasha', 'sasha@vfemail.net', '123', '321', 'avatars/ab/cd/ef/52465.jpg');
+VALUES ('0', '2021-04-12 16:10:07', 'Sasha', 'sasha@vfemail.net', '123', '321', 'https://black.gh4biz.ru/index.php/s/RHQmJJA6HT9E99e/preview');
 
 insert into posts(id, is_active, status, moderator_id, user_id, time, title, text, view_count)
 VALUES ('1', '1', 'NEW', 1, 1, '2020-12-31 18:00:07', 'О миграции БД',
@@ -136,3 +136,7 @@ INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 8, '2021-04-14 
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 2, '2021-04-12 18:09:07', '-1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 3, '2021-04-13 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 5, '2021-04-14 18:09:07', '1');
+
+INSERT INTO captcha_codes(id, time, code, secret_code) VALUES ('1', '2021-04-11 17:16:07', 'efsfeswf', 'afdadfadfq');
+INSERT INTO captcha_codes(time, code, secret_code) VALUES ('2021-04-11 18:16:07', 'efsfeswf', 'afdadfadfq');
+INSERT INTO captcha_codes(time, code, secret_code) VALUES ('2021-04-26 18:15:07', 'efsfeswf', 'afdadfadfq');
