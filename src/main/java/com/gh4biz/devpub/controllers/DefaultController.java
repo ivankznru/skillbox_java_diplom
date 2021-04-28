@@ -2,7 +2,7 @@ package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.model.response.InitResponse;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -14,10 +14,22 @@ public class DefaultController {
     }
 
     @RequestMapping("/")
-    public String greeting(Model model) {
-//        model.addAttribute("name", "name");
-//        System.out.println(initResponse.getTitle());
-//        System.out.println("-=-=-=-=-=-=-=-");
+    public String greeting() {
+        return "index";
+    }
+
+    @GetMapping("/posts/*")
+    private String getPosts(){
+        return "index";
+    }
+
+    @GetMapping("/tag/*")
+    private String getTag(){
+        return "index";
+    }
+
+    @GetMapping("/calendar/*")
+    private String getCalendar(){
         return "index";
     }
 

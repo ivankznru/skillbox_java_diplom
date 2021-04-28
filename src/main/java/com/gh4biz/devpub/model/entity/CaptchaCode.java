@@ -15,9 +15,12 @@ public class CaptchaCode {
 
     private Date time; //дата и время генерации кода капчи
 
-    private String code; //код, отображаемый на картинкке капчи
+    private String code; //код, отображаемый на картинке капчи
 
     @Column(name = "secret_code")
     private String secretCode; //код, передаваемый в параметре
+
+    public CaptchaCode() {
+    }
 
 }

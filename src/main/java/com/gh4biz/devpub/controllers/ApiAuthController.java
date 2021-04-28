@@ -1,14 +1,17 @@
 package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.model.entity.CaptchaCode;
+import com.gh4biz.devpub.model.entity.User;
+import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.CaptchaResponse;
+import com.gh4biz.devpub.model.response.RegError;
+import com.gh4biz.devpub.model.response.RegisterResult;
 import com.gh4biz.devpub.repo.CaptchaRepository;
+import com.gh4biz.devpub.repo.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import nl.captcha.Captcha;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,48 +24,77 @@ import java.util.*;
 @RequestMapping("/api")
 public class ApiAuthController {
     private CaptchaRepository captchaRepository;
+    private UserRepository userRepository;
 
-    public ApiAuthController(CaptchaRepository captchaRepository) {
+    public ApiAuthController(
+            CaptchaRepository captchaRepository,
+            UserRepository userRepository) {
         this.captchaRepository = captchaRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/auth/captcha")
     private ResponseEntity<CaptchaResponse> getCaptcha() throws IOException {
-
-        Iterable<CaptchaCode> captchaCodes = captchaRepository.findAll();
         deleteOldCaptchas();
+        return ResponseEntity.ok(generateCaptcha());
+    }
 
-        return ResponseEntity.ok(testCaptcha());
+    @PostMapping("/auth/register")
+    private ResponseEntity<RegisterResult> registerUser(@RequestBody RegisterForm form) {
+        CaptchaCode captcha = captchaRepository.findBySecretCode(form.getSecret());
+        RegError regErrors = new RegError();
+        if (!form.getCaptcha().equals(captcha.getCode())) {
+            regErrors.setCaptcha("Код с картинки введён неверно");
+            return ResponseEntity.ok(new RegisterResult(false, regErrors));
+        }
+        if (!(userRepository.findByEmail(form.getEmail()) == null)){
+            regErrors.setEmail("Этот e-mail уже зарегистрирован");
+            return ResponseEntity.ok(new RegisterResult(false, regErrors));
+        }
+        if (form.getName().isEmpty()){
+            regErrors.setName("Имя указано неверно");
+            return ResponseEntity.ok(new RegisterResult(false, regErrors));
+        }
+        User user = new User(
+                form.getName(),
+                form.getEmail(),
+                form.getPassword()
+        );
+        userRepository.save(user);
+        return ResponseEntity.ok(new RegisterResult(true));
     }
 
     private void deleteOldCaptchas() {
         Iterable<CaptchaCode> captchaCodes = captchaRepository.findAll();
         Calendar cSchedStartCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         long gmtTime = cSchedStartCal.getTime().getTime();
-        long timezoneAlteredTime = gmtTime + TimeZone.getTimeZone("Europe/Moscow").getRawOffset();
-        Calendar cSchedStartCal1 = Calendar.getInstance(TimeZone.getTimeZone("Europe/Moscow"));
-        cSchedStartCal1.setTimeInMillis(timezoneAlteredTime);
-//        TimeZone tm_curr = TimeZone.getDefault();
-//        if (tm_curr.getID().equals("Europe/Moscow")) {   }
-        long now = cSchedStartCal1.getTime().getTime() / 1000;
+        //     long timezoneAlteredTime = gmtTime + TimeZone.getTimeZone("Europe/Moscow").getRawOffset();
         for (CaptchaCode captchaCode : captchaCodes) {
             long captchaCodeLong = captchaCode.getTime().getTime() / 1000;
-            if ((now - captchaCodeLong) > 3600) {
+            if ((gmtTime / 1000 - captchaCodeLong) > 3600) {
                 captchaRepository.delete(captchaCode);
             }
         }
     }
 
-    private CaptchaResponse testCaptcha() throws IOException {
-        Captcha captcha = new Captcha.Builder(100, 30)
+    private CaptchaResponse generateCaptcha() throws IOException {
+        Captcha captcha = new Captcha.Builder(130, 50)
                 .addText()
                 .build();
-        RandomString secret = new RandomString(5);
-        byte[] bytes = toByteArray(captcha.getImage(), "png");
+        RandomString randomString = new RandomString(5);
+        String secret = randomString.nextString();
 
+        byte[] bytes = toByteArray(captcha.getImage(), "png");
         String bytesBase64 = Base64.getEncoder().encodeToString(bytes);
         String prefix = "data:image/png;base64, ";
-        return new CaptchaResponse(secret.nextString(), prefix.concat(bytesBase64));
+        CaptchaCode captchaCode = new CaptchaCode();
+
+        String code = captcha.getAnswer();
+        captchaCode.setCode(code);
+        captchaCode.setTime(new Date());
+        captchaCode.setSecretCode(secret);
+        captchaRepository.save(captchaCode);
+        return new CaptchaResponse(secret, prefix.concat(bytesBase64));
     }
 
     public static byte[] toByteArray(BufferedImage bi, String format)

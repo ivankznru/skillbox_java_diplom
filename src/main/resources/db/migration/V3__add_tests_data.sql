@@ -137,6 +137,6 @@ INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 2, '2021-04-12 
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 3, '2021-04-13 18:09:07', '1');
 INSERT INTO post_votes(user_id, post_id, time, value) VALUES (4, 5, '2021-04-14 18:09:07', '1');
 
-INSERT INTO captcha_codes(id, time, code, secret_code) VALUES ('1', '2021-04-11 17:16:07', 'efsfeswf', 'afdadfadfq');
+INSERT INTO captcha_codes(id, time, code, secret_code) VALUES ('1', '2021-04-11 17:16:07', 'qwer', 'afdadfadfq');
 INSERT INTO captcha_codes(time, code, secret_code) VALUES ('2021-04-11 18:16:07', 'efsfeswf', 'afdadfadfq');
 INSERT INTO captcha_codes(time, code, secret_code) VALUES ('2021-04-26 18:15:07', 'efsfeswf', 'afdadfadfq');
