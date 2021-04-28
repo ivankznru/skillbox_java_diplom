@@ -39,9 +39,4 @@ public class ApiGeneralController {
         return ResponseEntity.ok(settingsService.getGlobalSettings());
     }
 
-    @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\.]*}")
-    public String redirectToIndex() {
-        return "index";
-    }
-
 }

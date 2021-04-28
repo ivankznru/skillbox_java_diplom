@@ -10,6 +10,7 @@ import com.gh4biz.devpub.repo.CaptchaRepository;
 import com.gh4biz.devpub.repo.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import nl.captcha.Captcha;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,9 @@ import java.util.*;
 public class ApiAuthController {
     private CaptchaRepository captchaRepository;
     private UserRepository userRepository;
+
+    @Value("${blog.captchatimeout}")
+    private String captchaTimeout;
 
     public ApiAuthController(
             CaptchaRepository captchaRepository,
@@ -71,7 +75,7 @@ public class ApiAuthController {
         //     long timezoneAlteredTime = gmtTime + TimeZone.getTimeZone("Europe/Moscow").getRawOffset();
         for (CaptchaCode captchaCode : captchaCodes) {
             long captchaCodeLong = captchaCode.getTime().getTime() / 1000;
-            if ((gmtTime / 1000 - captchaCodeLong) > 3600) {
+            if ((gmtTime / 1000 - captchaCodeLong) > Long.parseLong(captchaTimeout)) {
                 captchaRepository.delete(captchaCode);
             }
         }

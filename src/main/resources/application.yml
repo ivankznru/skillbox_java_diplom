@@ -11,3 +11,4 @@ blog.phone: +7 (812) 244-54-32
 blog.email: vkotov@vfemail.net
 blog.copyright: Gh Ltd.
 blog.copyrightfrom: 2021
+blog.captchatimeout: 3600

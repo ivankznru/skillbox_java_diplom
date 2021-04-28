@@ -2,8 +2,8 @@ package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.model.response.InitResponse;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class DefaultController {
@@ -18,18 +18,8 @@ public class DefaultController {
         return "index";
     }
 
-    @GetMapping("/posts/*")
-    private String getPosts(){
-        return "index";
-    }
-
-    @GetMapping("/tag/*")
-    private String getTag(){
-        return "index";
-    }
-
-    @GetMapping("/calendar/*")
-    private String getCalendar(){
+    @RequestMapping(method = {RequestMethod.OPTIONS, RequestMethod.GET}, value = "/**/{path:[^\\.]*}")
+    public String redirectToIndex() {
         return "index";
     }
 
