@@ -1,4 +1,4 @@
-package com.gh4biz.devpub.model.response;
+package com.gh4biz.devpub.model;
 
 public enum ModerationStatus {
     NEW, ACCEPTED, DECLINED
