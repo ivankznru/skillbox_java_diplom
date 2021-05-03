@@ -12,4 +12,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id тэга
     private String name; //текст тэга
+
+    public Tag() {
+    }
 }

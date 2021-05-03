@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class CheckService {
     public CheckResponse check(){
-        CheckResponse checkResponse = new CheckResponse();
-        return checkResponse;
+        return new CheckResponse();
     }
 }

@@ -1,11 +1,13 @@
 package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.entity.PostComment;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.PostCommentsRepository;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
 import com.gh4biz.devpub.repo.Tag2PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -18,16 +20,17 @@ import java.util.ArrayList;
 
 @Service
 public class PostService {
-    private static PostRepository postRepository;
-    private static PostCommentsRepository postCommentsRepository;
-    private static PostVotesRepository postVotesRepository;
-    private static Tag2PostRepository tag2PostRepository;
+    private final PostRepository postRepository;
+    private final PostCommentsRepository postCommentsRepository;
+    private final PostVotesRepository postVotesRepository;
+    private final Tag2PostRepository tag2PostRepository;
 
     private final int ANNOUNCE_TEXT_LIMIT = 150;
     private final int LIKE_VALUE = 1;
     private final int DISLIKE_VALUE = -1;
     private final int ACTIVE_POST_VALUE = 1;
 
+    @Autowired
     private PostService(PostRepository postRepository,
                         PostCommentsRepository postCommentsRepository,
                         PostVotesRepository postVotesRepository,
@@ -38,20 +41,16 @@ public class PostService {
         this.tag2PostRepository = tag2PostRepository;
     }
 
-    public PostRepository getPostRepository() {
-        return postRepository;
-    }
-
-    public static PostCommentsRepository getPostCommentsRepository() {
-        return postCommentsRepository;
-    }
-
-    public static PostVotesRepository getPostVotesRepository() {
-        return postVotesRepository;
-    }
-
-    public static int getVoteCount(Post post, int vote) {
+    public int getVoteCount(Post post, int vote) {
         return postVotesRepository.countAllByPostIdAndValue(post.getId(), vote);
+    }
+
+    public Post findPostById(int id) {
+        return postRepository.findPostsById(id);
+    }
+
+    public ArrayList<PostComment> getPostCommentsByPostId(int id) {
+        return postCommentsRepository.findAllByPostId(id);
     }
 
     public ResponseEntity<PostsResponse> getPosts(int offset, int limit, String mode) {

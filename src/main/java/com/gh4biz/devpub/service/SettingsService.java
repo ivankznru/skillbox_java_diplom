@@ -1,52 +1,35 @@
 package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.response.SettingsResponse;
-import com.gh4biz.devpub.model.entity.GlobalSettings;
 import com.gh4biz.devpub.repo.GlobalSettingsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 @Service
 public class SettingsService {
-    private GlobalSettingsRepository globalSettingsRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
 
+    @Autowired
     public SettingsService(GlobalSettingsRepository globalSettingsRepository) {
         this.globalSettingsRepository = globalSettingsRepository;
     }
 
     public SettingsResponse getGlobalSettings() {
-        SettingsResponse settingsResponse = new SettingsResponse();
-        Iterable<GlobalSettings> globalSettings = globalSettingsRepository.findAll();
-        ArrayList<GlobalSettings> globalSettingsArrayList = new ArrayList<>();
-        globalSettings.forEach(globalSettingsArrayList::add);
-
-        for (GlobalSettings set : globalSettingsArrayList){
-            if (set.getCode().equals("MULTIUSER_MODE")) {
-                if (set.getValue().equals("YES")){
-                    settingsResponse.setMultiuserMode(true);
-                }
-                if (set.getValue().equals("NO")){
-                    settingsResponse.setMultiuserMode(false);
-                }
-            }
-            if (set.getCode().equals("POST_PREMODERATION")) {
-                if (set.getValue().equals("YES")){
-                    settingsResponse.setPostPremoderation(true);
-                }
-                if (set.getValue().equals("NO")){
-                    settingsResponse.setPostPremoderation(false);
-                }
-            }
-            if (set.getCode().equals("STATISTICS_IS_PUBLIC")) {
-                if (set.getValue().equals("YES")){
-                    settingsResponse.setStatisticsIsPublic(true);
-                }
-                if (set.getValue().equals("NO")){
-                    settingsResponse.setStatisticsIsPublic(false);
-                }
-            }
-        }
-        return settingsResponse;
+        boolean multiuserMode =
+                globalSettingsRepository
+                        .findByCode("MULTIUSER_MODE")
+                        .getValue()
+                        .equals("YES");
+        boolean postPremoderation =
+                globalSettingsRepository
+                        .findByCode("POST_PREMODERATION")
+                        .getValue()
+                        .equals("YES");
+        boolean statisticsIsPublic =
+                globalSettingsRepository
+                        .findByCode("STATISTICS_IS_PUBLIC")
+                        .getValue()
+                        .equals("YES");
+        return new SettingsResponse(multiuserMode, postPremoderation, statisticsIsPublic);
     }
 }

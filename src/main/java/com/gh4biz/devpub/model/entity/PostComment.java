@@ -27,4 +27,6 @@ public class PostComment {
     @Column(columnDefinition = "TEXT")
     private String text; //текст комментария
 
+    public PostComment() {
+    }
 }

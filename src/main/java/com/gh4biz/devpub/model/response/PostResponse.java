@@ -22,6 +22,7 @@ public class PostResponse {
     private ArrayList<CommentResponse> comments;
     private List<String> tags;
     private Post post;
+    private PostService postService;
 
     public PostResponse(Post post) {
         this.post = post;
@@ -35,15 +36,15 @@ public class PostResponse {
                 post.getUser().getName());
         this.title = post.getTitle();
         this.text = post.getText();
-        this.likeCount = PostService.getVoteCount(post, 1);
-        this.dislikeCount = PostService.getVoteCount(post, -1);
+        this.likeCount = postService.getVoteCount(post, 1);
+        this.dislikeCount = postService.getVoteCount(post, -1);
         this.viewCount = post.getViewCount();
         this.comments = getComments(post.getId());
     }
 
     private ArrayList<CommentResponse> getComments(int postId) {
         ArrayList<CommentResponse> commentResponseArrayList = new ArrayList<>();
-        ArrayList<PostComment> commentsIdList = PostService.getPostCommentsRepository().findAllByPostId(postId);
+        ArrayList<PostComment> commentsIdList = postService.getPostCommentsByPostId(postId);
         for (PostComment postComment : commentsIdList) {
             //PostComment postComment = PostService.getPostCommentsRepository().findPostCommentById(commentId);
             commentResponseArrayList.add(
@@ -54,12 +55,8 @@ public class PostResponse {
                             new UserWithPhotoResponse(
                                     postComment.getUser().getId(),
                                     postComment.getUser().getName(),
-                                    postComment.getUser().getPhoto()
-                            )
-                    )
-            );
+                                    postComment.getUser().getPhoto())));
         }
-
         return commentResponseArrayList;
     }
 

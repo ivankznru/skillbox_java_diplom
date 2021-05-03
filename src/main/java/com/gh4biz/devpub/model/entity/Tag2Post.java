@@ -19,4 +19,7 @@ public class Tag2Post {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Tag tag; //id тэга
+
+    public Tag2Post() {
+    }
 }

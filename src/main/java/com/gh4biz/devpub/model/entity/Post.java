@@ -36,4 +36,6 @@ public class Post {
     @Column(name = "view_count")
     private int viewCount; //количество просмотров поста
 
+    public Post() {
+    }
 }

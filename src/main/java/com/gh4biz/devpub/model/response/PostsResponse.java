@@ -10,7 +10,4 @@ import java.util.List;
 public class PostsResponse {
     private int count;
     private List<PostAnnotationResponse> posts;
-
-    public PostsResponse() {
-    }
 }

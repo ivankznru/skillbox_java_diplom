@@ -5,6 +5,7 @@ import com.gh4biz.devpub.model.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,15 +17,16 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/", "/api/init").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/post").hasAuthority(Permission.USER.getPermission())
-                .antMatchers(HttpMethod.GET, "/api/post/search").hasAuthority(Permission.MODERATE.getPermission())
+                .antMatchers(HttpMethod.GET,  "/api/settings", "/api/init", "/api/auth/check").permitAll()
+//                .antMatchers(HttpMethod.GET, "/api/post").hasAuthority(Permission.USER.getPermission())
+//                .antMatchers(HttpMethod.GET, "/api/post/search").hasAuthority(Permission.MODERATE.getPermission())
                 .anyRequest()
                 .authenticated()
                 .and()

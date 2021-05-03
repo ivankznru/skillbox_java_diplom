@@ -2,6 +2,7 @@ package com.gh4biz.devpub.model.response;
 
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 @Data

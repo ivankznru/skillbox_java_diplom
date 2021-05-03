@@ -4,4 +4,5 @@ import com.gh4biz.devpub.model.entity.GlobalSettings;
 import org.springframework.data.repository.CrudRepository;
 
 public interface GlobalSettingsRepository extends CrudRepository<GlobalSettings, Integer> {
+    GlobalSettings findByCode(String code);
 }

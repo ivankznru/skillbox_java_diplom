@@ -18,4 +18,6 @@ public class GlobalSettings {
 
     private String value; //значение настройки
 
+    public GlobalSettings() {
+    }
 }
