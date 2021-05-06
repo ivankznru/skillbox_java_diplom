@@ -31,7 +31,7 @@ public class PostService {
     private final int ACTIVE_POST_VALUE = 1;
 
     @Autowired
-    private PostService(PostRepository postRepository,
+    public PostService(PostRepository postRepository,
                         PostCommentsRepository postCommentsRepository,
                         PostVotesRepository postVotesRepository,
                         Tag2PostRepository tag2PostRepository) {
@@ -42,6 +42,7 @@ public class PostService {
     }
 
     public int getVoteCount(Post post, int vote) {
+        //System.out.println(post.getId());
         return postVotesRepository.countAllByPostIdAndValue(post.getId(), vote);
     }
 
@@ -182,7 +183,7 @@ public class PostService {
     public PostsResponse getPostsByTag(int offset, int limit, String tag) {
         String tag2resp = "%".concat(tag).concat("%");
         ArrayList<Integer> posts =
-                tag2PostRepository.getPosts(
+                tag2PostRepository.getPostsByQuery(
                         tag2resp,
                         PageRequest.of(offset / limit, limit));
 
@@ -191,8 +192,48 @@ public class PostService {
             Post post = postRepository.findPostsById(postId);
             postAnnotationResponseList.add(convert2Post4Response(post));
         }
-        int count = tag2PostRepository.countTagPosts(tag2resp);
+        int count = tag2PostRepository.countPostsByTagName(tag2resp);
         return new PostsResponse(count, postAnnotationResponseList);
     }
 
+    public PostResponse getPostById(int id){
+        Post post = postRepository.findPostsById(id);
+        PostResponse postResponse = new PostResponse();
+
+        postResponse.setId(post.getId());
+        postResponse.setTimestamp(post.getTime().getTime() / 1000);
+        if (post.getIsActive() == 1) {
+            postResponse.setActive(true);
+        }
+        postResponse.setUser(new UserResponse(
+                post.getUser().getId(),
+                post.getUser().getName()));
+        postResponse.setTitle(post.getTitle());
+        postResponse.setText(post.getText());
+        postResponse.setLikeCount(getVoteCount(post, 1));
+        postResponse.setLikeCount(getVoteCount(post, -1));
+
+        postResponse.setViewCount(post.getViewCount());
+        postResponse.setComments(getComments(id));
+
+        return postResponse;
+    }
+
+    private ArrayList<CommentResponse> getComments(int postId) {
+        ArrayList<CommentResponse> commentResponseArrayList = new ArrayList<>();
+        ArrayList<PostComment> commentsIdList = getPostCommentsByPostId(postId);
+        for (PostComment postComment : commentsIdList) {
+            //PostComment postComment = PostService.getPostCommentsRepository().findPostCommentById(commentId);
+            commentResponseArrayList.add(
+                    new CommentResponse(
+                            postComment.getId(),
+                            postComment.getTime().getTime() / 1000,
+                            postComment.getText(),
+                            new UserWithPhotoResponse(
+                                    postComment.getUser().getId(),
+                                    postComment.getUser().getName(),
+                                    postComment.getUser().getPhoto())));
+        }
+        return commentResponseArrayList;
+    }
 }

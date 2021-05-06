@@ -25,18 +25,13 @@ public class ApiGeneralController {
         this.checkService = checkService;
     }
 
-    @GetMapping("/auth/check")
-    private ResponseEntity<CheckResponse> checkResponse(){
-        return ResponseEntity.ok(checkService.check());
-    }
-
     @GetMapping("/init")
-    private ResponseEntity<InitResponse> init(){
+    public ResponseEntity<InitResponse> init(){
         return ResponseEntity.ok(initResponse);
     }
 
     @GetMapping("/settings")
-    private ResponseEntity<SettingsResponse> settingsResponse(){
+    public ResponseEntity<SettingsResponse> settingsResponse(){
         return ResponseEntity.ok(settingsService.getGlobalSettings());
     }
 

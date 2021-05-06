@@ -9,9 +9,18 @@ import java.util.ArrayList;
 
 public interface Tag2PostRepository extends CrudRepository<Tag2Post ,Integer> {
 
-    @Query("select post.id from Tag2Post where tag.name like ?1 and post.isActive = 1 order by post.time desc")
-    ArrayList<Integer> getPosts(String query, Pageable pageable);
+    @Query("SELECT post.id FROM Tag2Post WHERE tag.name LIKE ?1 AND post.isActive = 1 ORDER BY post.time DESC")
+    ArrayList<Integer> getPostsByQuery(String query, Pageable pageable);
+
+    @Query("SELECT post.id FROM Tag2Post WHERE post.isActive = 1 GROUP BY post.id ORDER BY post.time DESC")
+    ArrayList<Integer> getPosts();
+
+    @Query("SELECT count(*) FROM Tag2Post WHERE post.isActive = 1 and tag.id like ?1")
+    int countPostsByTagId(Integer id);
 
     @Query("SELECT count(*) FROM Tag2Post WHERE post.isActive = 1 and tag.name like ?1")
-    int countTagPosts(String query);
+    int countPostsByTagName(String tagName);
+
+    @Query("SELECT tag.id FROM Tag2Post WHERE post.isActive = 1 GROUP BY tag.id ORDER BY count(*) DESC")
+    ArrayList<Integer> getOrderedTags();
 }

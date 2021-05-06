@@ -1,6 +1,7 @@
 package com.gh4biz.devpub.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.gh4biz.devpub.model.Role;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -44,4 +45,9 @@ public class User {
         this.regTime = new Date();
         this.isModerator = 0;
     }
+
+    public Role getRole(){
+        return isModerator == 1 ? Role.MODERATOR : Role.USER;
+    }
+
 }

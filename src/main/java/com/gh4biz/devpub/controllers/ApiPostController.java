@@ -14,14 +14,13 @@ public class ApiPostController {
     private final PostService postService;
 
     @Autowired
-    public ApiPostController(PostService postService
-    ) {
+    public ApiPostController(PostService postService) {
         this.postService = postService;
     }
 
     @GetMapping("/post")
-    @PreAuthorize("hasAuthority('user:write')")
-    private ResponseEntity<PostsResponse> listOfPosts(
+//    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<PostsResponse> listOfPosts(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(defaultValue = "recent") String mode) {
@@ -29,8 +28,8 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/search")
-    @PreAuthorize("hasAuthority('user:moderate')")
-    private ResponseEntity<PostsResponse> searchResponse(
+//    @PreAuthorize("hasAuthority('user:moderate')")
+    public ResponseEntity<PostsResponse> searchResponse(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam String query
@@ -39,7 +38,7 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/byDate")
-    private ResponseEntity<PostsResponse> getPostsByDate(
+    public ResponseEntity<PostsResponse> getPostsByDate(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam String date) {
@@ -47,7 +46,7 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/byTag")
-    private ResponseEntity<PostsResponse> getPostsByTag(
+    public ResponseEntity<PostsResponse> getPostsByTag(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam String tag) {
@@ -55,10 +54,8 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/{id}")
-    private ResponseEntity<PostResponse> getPostById(
+    public ResponseEntity<PostResponse> getPostById(
             @PathVariable int id) {
-        Post post = postService.findPostById(id);
-        PostResponse postResponse = new PostResponse(post);
-        return ResponseEntity.ok(postResponse);
+        return ResponseEntity.ok(postService.getPostById(id));
     }
 }

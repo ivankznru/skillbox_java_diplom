@@ -25,7 +25,7 @@ public class ApiCalendarController {
     }
 
     @GetMapping("/calendar")
-    private ResponseEntity<PostsByYearResponse> postsResponseByYear(
+    public ResponseEntity<PostsByYearResponse> postsResponseByYear(
             @RequestParam int year
     ) throws ParseException {
         String strStart = year + "-01-01 00:00:00";  // Start date
