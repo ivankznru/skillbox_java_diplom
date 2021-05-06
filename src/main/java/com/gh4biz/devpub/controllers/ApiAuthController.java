@@ -1,9 +1,11 @@
 package com.gh4biz.devpub.controllers;
 
+import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.request.LoginRequest;
 import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.model.RegisterResult;
+import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.UserRepository;
 import com.gh4biz.devpub.service.CaptchaService;
 import com.gh4biz.devpub.service.RegisterService;
@@ -28,17 +30,20 @@ public class ApiAuthController {
     private final RegisterService registerService;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
 
     @Autowired
     public ApiAuthController(
             CaptchaService captchaService,
             RegisterService registerService,
             AuthenticationManager authenticationManager,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            PostRepository postRepository) {
         this.captchaService = captchaService;
         this.registerService = registerService;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
+        this.postRepository = postRepository;
     }
 
     @GetMapping("/auth/captcha")
@@ -78,6 +83,12 @@ public class ApiAuthController {
         userResponse.setId(currentUser.getId());
         userResponse.setName(currentUser.getName());
         userResponse.setPhoto(currentUser.getPhoto());
+        if (currentUser.getIsModerator() == 1)
+        userResponse.setModerationCount(postRepository.countByIsActiveAndStatusAndModerator(
+                1,
+                ModerationStatus.NEW,
+                currentUser
+        ));
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setResult(true);
         loginResponse.setUserLoginResponse(userResponse);

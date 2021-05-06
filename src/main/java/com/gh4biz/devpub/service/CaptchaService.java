@@ -22,7 +22,7 @@ import java.util.TimeZone;
 public class CaptchaService {
     private final CaptchaRepository captchaRepository;
 
-    @Value("${blog.captchatimeout}")
+    @Value("${blogCaptchaTimeout}")
     private String captchaTimeout;
 
     @Autowired

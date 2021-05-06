@@ -1,6 +1,8 @@
 package com.gh4biz.devpub.repo;
 
+import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -37,4 +39,13 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
 
     @Query("SELECT count(*) FROM Post WHERE isActive = 1 and (text LIKE ?1 or title LIKE ?1) order by time desc")
     int countSearchPosts(String query);
+
+    int countByIsActiveAndStatusAndModerator(Integer isActive, ModerationStatus status, User moderator);
+
+    Slice<Post> findAllByIsActiveAndStatusAndModerator(int isActive, ModerationStatus status, User moderator, Pageable pageable);
+
+//    int countByModerator(User moderator);
+//
+//    int findByIsActiveAndModerator(int id, User moderator);
+
 }

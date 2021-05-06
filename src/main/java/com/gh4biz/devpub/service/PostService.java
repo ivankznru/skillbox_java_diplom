@@ -1,19 +1,21 @@
 package com.gh4biz.devpub.service;
 
+import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.entity.Post;
 import com.gh4biz.devpub.model.entity.PostComment;
+import com.gh4biz.devpub.model.entity.User;
 import com.gh4biz.devpub.model.response.*;
-import com.gh4biz.devpub.repo.PostCommentsRepository;
-import com.gh4biz.devpub.repo.PostRepository;
-import com.gh4biz.devpub.repo.PostVotesRepository;
-import com.gh4biz.devpub.repo.Tag2PostRepository;
+import com.gh4biz.devpub.repo.*;
+import com.gh4biz.devpub.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -24,21 +26,28 @@ public class PostService {
     private final PostCommentsRepository postCommentsRepository;
     private final PostVotesRepository postVotesRepository;
     private final Tag2PostRepository tag2PostRepository;
+    private final UserRepository userRepository;
+    private final UserDetailsServiceImpl userDetailsService;
+    @Value("${blogAnnounceTextLimit}")
+    private Integer blogAnnounceTextLimit;
 
-    private final int ANNOUNCE_TEXT_LIMIT = 150;
     private final int LIKE_VALUE = 1;
     private final int DISLIKE_VALUE = -1;
     private final int ACTIVE_POST_VALUE = 1;
 
     @Autowired
     public PostService(PostRepository postRepository,
-                        PostCommentsRepository postCommentsRepository,
-                        PostVotesRepository postVotesRepository,
-                        Tag2PostRepository tag2PostRepository) {
+                       PostCommentsRepository postCommentsRepository,
+                       PostVotesRepository postVotesRepository,
+                       Tag2PostRepository tag2PostRepository,
+                       UserRepository userRepository,
+                       UserDetailsServiceImpl userDetailsService) {
         this.postRepository = postRepository;
         this.postCommentsRepository = postCommentsRepository;
         this.postVotesRepository = postVotesRepository;
         this.tag2PostRepository = tag2PostRepository;
+        this.userRepository = userRepository;
+        this.userDetailsService = userDetailsService;
     }
 
     public int getVoteCount(Post post, int vote) {
@@ -133,7 +142,7 @@ public class PostService {
                         post.getUser().getName()),
                 post.getTitle(),
                 post.getText().substring // анонс
-                        (0, Math.min(ANNOUNCE_TEXT_LIMIT, post.getText().length()))
+                        (0, Math.min(blogAnnounceTextLimit, post.getText().length()))
                         .concat("..."),
                 getVoteCount(post, LIKE_VALUE),
                 getVoteCount(post, DISLIKE_VALUE),
@@ -196,7 +205,7 @@ public class PostService {
         return new PostsResponse(count, postAnnotationResponseList);
     }
 
-    public PostResponse getPostById(int id){
+    public PostResponse getPostById(int id) {
         Post post = postRepository.findPostsById(id);
         PostResponse postResponse = new PostResponse();
 
@@ -235,5 +244,22 @@ public class PostService {
                                     postComment.getUser().getPhoto())));
         }
         return commentResponseArrayList;
+    }
+
+    public ResponseEntity<PostsResponse> getModerationPosts(int offset, int limit, String status, Principal principal) {
+        User moderator = userRepository.findByEmail(principal.getName()).get();
+        int count = postRepository.countByIsActiveAndStatusAndModerator(1, ModerationStatus.NEW, moderator);
+        Slice<Post> posts = postRepository.findAllByIsActiveAndStatusAndModerator(
+                1,
+                ModerationStatus.NEW,
+                moderator,
+                PageRequest.of(offset / limit, limit));
+
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
+        for (Post post : posts) {
+            postAnnotationResponseList.add(convert2Post4Response(post));
+        }
+
+        return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
     }
 }

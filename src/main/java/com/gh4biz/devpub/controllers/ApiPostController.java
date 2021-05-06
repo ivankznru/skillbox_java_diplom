@@ -1,12 +1,13 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.model.entity.Post;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +29,6 @@ public class ApiPostController {
     }
 
     @GetMapping("/post/search")
-//    @PreAuthorize("hasAuthority('user:moderate')")
     public ResponseEntity<PostsResponse> searchResponse(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
@@ -57,5 +57,15 @@ public class ApiPostController {
     public ResponseEntity<PostResponse> getPostById(
             @PathVariable int id) {
         return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    @GetMapping("/post/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    public ResponseEntity<PostsResponse> listOfModerationPosts(
+            @RequestParam(defaultValue = "0", required = false) int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String status,
+            Principal principal) {
+        return postService.getModerationPosts(offset, limit, status, principal);
     }
 }
