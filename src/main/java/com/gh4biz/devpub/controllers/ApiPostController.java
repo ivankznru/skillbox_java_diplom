@@ -1,5 +1,7 @@
 package com.gh4biz.devpub.controllers;
 
+import com.gh4biz.devpub.model.request.PostPostForm;
+import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,6 @@ public class ApiPostController {
     }
 
     @GetMapping("/post")
-//    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<PostsResponse> listOfPosts(
             @RequestParam(defaultValue = "0", required = false) int offset,
             @RequestParam(defaultValue = "10") int limit,
@@ -67,5 +68,23 @@ public class ApiPostController {
             @RequestParam String status,
             Principal principal) {
         return postService.getModerationPosts(offset, limit, status, principal);
+    }
+
+    @GetMapping("/post/my")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<PostsResponse> listOfMyPosts(
+            @RequestParam(defaultValue = "0", required = false) int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam String status,
+            Principal principal) {
+        return postService.getMyPosts(offset, limit, status, principal);
+    }
+
+    @PostMapping("/post")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<PostPostErrorsResponse> postPost(
+            @RequestBody PostPostForm form,
+            Principal principal) {
+        return postService.postPostResult(form, principal);
     }
 }

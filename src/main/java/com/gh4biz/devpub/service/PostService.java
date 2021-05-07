@@ -1,12 +1,13 @@
 package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.ModerationStatus;
-import com.gh4biz.devpub.model.entity.Post;
-import com.gh4biz.devpub.model.entity.PostComment;
-import com.gh4biz.devpub.model.entity.User;
+import com.gh4biz.devpub.model.entity.*;
+import com.gh4biz.devpub.model.request.PostPostForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.*;
 import com.gh4biz.devpub.security.UserDetailsServiceImpl;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.*;
 
 @Service
 public class PostService {
@@ -27,7 +28,9 @@ public class PostService {
     private final PostVotesRepository postVotesRepository;
     private final Tag2PostRepository tag2PostRepository;
     private final UserRepository userRepository;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final TagRepository tagRepository;
+
+    // private final UserDetailsServiceImpl userDetailsService;
     @Value("${blogAnnounceTextLimit}")
     private Integer blogAnnounceTextLimit;
 
@@ -41,17 +44,19 @@ public class PostService {
                        PostVotesRepository postVotesRepository,
                        Tag2PostRepository tag2PostRepository,
                        UserRepository userRepository,
-                       UserDetailsServiceImpl userDetailsService) {
+                       TagRepository tagRepository
+                       //                   UserDetailsServiceImpl userDetailsService
+    ) {
         this.postRepository = postRepository;
         this.postCommentsRepository = postCommentsRepository;
         this.postVotesRepository = postVotesRepository;
         this.tag2PostRepository = tag2PostRepository;
         this.userRepository = userRepository;
-        this.userDetailsService = userDetailsService;
+        this.tagRepository = tagRepository;
+        //   this.userDetailsService = userDetailsService;
     }
 
     public int getVoteCount(Post post, int vote) {
-        //System.out.println(post.getId());
         return postVotesRepository.countAllByPostIdAndValue(post.getId(), vote);
     }
 
@@ -135,15 +140,16 @@ public class PostService {
     }
 
     private PostAnnotationResponse convert2Post4Response(Post post) {
+        Document doc = Jsoup.parse(post.getText());
+        String text = doc.text();
+        String announce = text.substring(0, Math.min(blogAnnounceTextLimit, text.length()));
         return new PostAnnotationResponse(post.getId(),
                 post.getTime().getTime() / 1000,
                 new UserResponse(
                         post.getUser().getId(),
                         post.getUser().getName()),
                 post.getTitle(),
-                post.getText().substring // анонс
-                        (0, Math.min(blogAnnounceTextLimit, post.getText().length()))
-                        .concat("..."),
+                announce.concat("..."),
                 getVoteCount(post, LIKE_VALUE),
                 getVoteCount(post, DISLIKE_VALUE),
                 getCommentsCount(post),
@@ -261,5 +267,59 @@ public class PostService {
         }
 
         return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
+    }
+
+    public ResponseEntity<PostsResponse> getMyPosts(int offset, int limit, String status, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).get();
+        int isActive = status.equals("inactive") ? 0 : 1;
+        int count = postRepository.countByIsActiveAndStatusAndUser(isActive, ModerationStatus.getByStatus(status), user);
+        Slice<Post> posts = postRepository.findAllByIsActiveAndStatusAndUser(
+                isActive,
+                ModerationStatus.getByStatus(status),
+                user,
+                PageRequest.of(offset / limit, limit));
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
+        for (Post post : posts) {
+            postAnnotationResponseList.add(convert2Post4Response(post));
+        }
+        return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
+    }
+
+    public ResponseEntity<PostPostErrorsResponse> postPostResult(PostPostForm form, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).get();
+        Calendar calendar = Calendar.getInstance();
+        //String timeZoneId = calendar.getTimeZone().getID();
+        long formTimestamp = form.getTimestamp();
+        long currentTimestamp = calendar.toInstant().getEpochSecond();
+        HashMap<String, String> errors = new HashMap<>();
+        if ((currentTimestamp - formTimestamp) > 600) {
+            errors.put("timestamp", "Проверьте дату публикации");
+            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+        }
+        if ((form.getTitle().isEmpty()) || (form.getTitle().length() < 3)) {
+            errors.put("title", "Текст заголовка менее трёх символов!");
+            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+        }
+        if ((form.getText().isEmpty()) || (form.getText().length() < 50)) {
+            errors.put("text", "Текст поста менее 50 символов!");
+            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+        }
+
+        Post post = new Post(1,
+                ModerationStatus.NEW,
+                user,
+                new Date(formTimestamp * 1000),
+                form.getTitle(),
+                form.getText());
+        postRepository.save(post);
+
+        for (String tagName : form.getTags()) {
+            Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
+            Tag2Post tag2Post = optionalTag.isPresent() ?
+                    new Tag2Post(post, optionalTag.get()) :
+                    new Tag2Post(post, new Tag(tagName));
+            tag2PostRepository.save(tag2Post);
+        }
+        return ResponseEntity.ok(new PostPostErrorsResponse(true));
     }
 }

@@ -38,4 +38,14 @@ public class Post {
 
     public Post() {
     }
+
+    public Post(int isActive, ModerationStatus status, User user, Date time, String title, String text) {
+        this.isActive = isActive;
+        this.status = status;
+        this.user = user;
+        this.time = time;
+        this.title = title;
+        this.text = text;
+        viewCount = 0;
+    }
 }

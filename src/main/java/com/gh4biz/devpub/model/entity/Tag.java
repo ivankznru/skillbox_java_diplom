@@ -13,6 +13,10 @@ public class Tag {
     private int id; //id тэга
     private String name; //текст тэга
 
+    public Tag(String tagName) {
+        this.name = tagName;
+    }
+
     public Tag() {
     }
 }

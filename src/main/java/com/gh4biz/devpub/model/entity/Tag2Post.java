@@ -20,4 +20,9 @@ public class Tag2Post {
 
     public Tag2Post() {
     }
+
+    public Tag2Post(Post post, Tag tag) {
+        this.post = post;
+        this.tag = tag;
+    }
 }
