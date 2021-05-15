@@ -3,15 +3,18 @@ package com.gh4biz.devpub.model.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
-public class PostPostErrorsResponse {
-    private boolean result;
-    private Map<String, String> errors;
+public class Response {
 
-    public PostPostErrorsResponse(boolean result) {
+    private boolean result;
+    private String message;
+
+    public Response(String message) {
+        this.message = message;
+    }
+
+    public Response(boolean result) {
         this.result = result;
     }
 }

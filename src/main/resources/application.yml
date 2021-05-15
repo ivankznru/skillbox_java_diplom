@@ -5,6 +5,18 @@ spring.datasource.password: testTEST667+667
 spring.jpa.hibernate.ddl-auto: validate
 spring.jpa.show-sql: false
 
+server:
+  tomcat:
+    max-swallow-size: -1
+
+#spring:
+#  servlet:
+#    multipart:
+#      enabled: true
+#      max-request-size: 5MB
+#      max-file-size: 10MB
+
+
 blogTitle: DevPub
 blogSubtitle: Рассказы разработчиков
 blogPhone: +7 (812) 244-54-32
@@ -14,3 +26,4 @@ blogCopyrightfrom: 2021
 
 blogCaptchaTimeout: 3600
 blogAnnounceTextLimit: 150
+blogUploadImageSizeLimit: 3145728

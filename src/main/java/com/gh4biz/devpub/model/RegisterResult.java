@@ -1,6 +1,5 @@
 package com.gh4biz.devpub.model;
 
-import com.gh4biz.devpub.model.RegError;
 import lombok.Data;
 
 

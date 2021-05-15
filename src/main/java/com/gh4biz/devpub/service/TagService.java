@@ -29,13 +29,14 @@ public class TagService {
         TagResponse tagResponse = new TagResponse();
         int postsCount = postRepository.countAllByIsActive(1);
         ArrayList<TagWeight> tagWeights = new ArrayList<>();
-        ArrayList<Integer> orderedTagsId = tag2PostRepository.getOrderedTags();
-        int mostPopularTagId = tag2PostRepository.countPostsByTagId(orderedTagsId.size() - 1);
-        for (Integer tagId : orderedTagsId) {
+        ArrayList<Integer> orderedTagsIdByTagsCount = tag2PostRepository.getOrderedTags();
+        int idMax = orderedTagsIdByTagsCount.get(0);
+        double dWeightMax = (double) tag2PostRepository.countPostsByTagId(idMax) / postsCount;
+        for (Integer tagId : orderedTagsIdByTagsCount) {
             int count = tag2PostRepository.countPostsByTagId(tagId);
-            double dWeightMax = (double) tag2PostRepository.countPostsByTagId(mostPopularTagId) / (double) postsCount;
+            double dWeight = (double) count / postsCount;
             double kNormal = 1 / dWeightMax;
-            double weight = ((double) count / (double) postsCount) * kNormal;
+            double weight = dWeight * kNormal;
             tagWeights.add(new TagWeight(tagRepository.findById(tagId).get().getName(), weight));
         }
         tagResponse.setTagsList(tagWeights);

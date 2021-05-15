@@ -2,10 +2,9 @@ package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.entity.*;
-import com.gh4biz.devpub.model.request.PostPostForm;
+import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.*;
-import com.gh4biz.devpub.security.UserDetailsServiceImpl;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -285,7 +284,7 @@ public class PostService {
         return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
     }
 
-    public ResponseEntity<PostPostErrorsResponse> postPostResult(PostPostForm form, Principal principal) {
+    public ResponseEntity<PostUpdateEditUploadErrorsResponse> postAddOrEditResult(int id, PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
         Calendar calendar = Calendar.getInstance();
         //String timeZoneId = calendar.getTimeZone().getID();
@@ -294,24 +293,38 @@ public class PostService {
         HashMap<String, String> errors = new HashMap<>();
         if ((currentTimestamp - formTimestamp) > 600) {
             errors.put("timestamp", "Проверьте дату публикации");
-            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+            return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, errors));
         }
         if ((form.getTitle().isEmpty()) || (form.getTitle().length() < 3)) {
             errors.put("title", "Текст заголовка менее трёх символов!");
-            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+            return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, errors));
         }
         if ((form.getText().isEmpty()) || (form.getText().length() < 50)) {
             errors.put("text", "Текст поста менее 50 символов!");
-            return ResponseEntity.ok(new PostPostErrorsResponse(false, errors));
+            return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, errors));
         }
 
-        Post post = new Post(1,
-                ModerationStatus.NEW,
-                user,
-                new Date(formTimestamp * 1000),
-                form.getTitle(),
-                form.getText());
-        postRepository.save(post);
+        Post post;
+        if (id > 0) {
+            post = postRepository.findPostsById(id);
+            post.setIsActive(form.getActive());
+            if (!post.getModerator().equals(user)) {
+                post.setStatus(ModerationStatus.NEW);
+            }
+            post.setTime(new Date(formTimestamp * 1000));
+            post.setTitle(form.getTitle());
+            post.setText(form.getText());
+            postRepository.save(post);
+
+        } else {
+            post = new Post(1,
+                    ModerationStatus.NEW,
+                    user,
+                    new Date(formTimestamp * 1000),
+                    form.getTitle(),
+                    form.getText());
+            postRepository.save(post);
+        }
 
         for (String tagName : form.getTags()) {
             Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
@@ -320,6 +333,6 @@ public class PostService {
                     new Tag2Post(post, new Tag(tagName));
             tag2PostRepository.save(tag2Post);
         }
-        return ResponseEntity.ok(new PostPostErrorsResponse(true));
+        return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(true));
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PostPostForm {
+public class PostEditForm {
     private long timestamp;
     private int active;
     private String title;
