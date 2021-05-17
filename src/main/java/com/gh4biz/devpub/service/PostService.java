@@ -145,7 +145,7 @@ public class PostService {
                 PageRequest.of(offset / limit, limit)
         );
 
-        for (Post post : postRepository.findAllById(posts)){
+        for (Post post : postRepository.findAllById(posts)) {
             postAnnotationResponseList.add(convert2Post4Response(post));
         }
 
@@ -269,7 +269,7 @@ public class PostService {
     public ResponseEntity<PostUpdateEditUploadErrorsResponse> postAdd(PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
 
-        if (!checkPost(form).isEmpty()){
+        if (!checkPost(form).isEmpty()) {
             return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, checkPost(form)));
         }
 
@@ -293,7 +293,7 @@ public class PostService {
 
     public ResponseEntity<PostUpdateEditUploadErrorsResponse> postEdit(int id, PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
-        if (!checkPost(form).isEmpty()){
+        if (!checkPost(form).isEmpty()) {
             return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, checkPost(form)));
         }
 
@@ -319,7 +319,7 @@ public class PostService {
         return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(true));
     }
 
-    private HashMap<String, String> checkPost (PostEditForm form){
+    private HashMap<String, String> checkPost(PostEditForm form) {
         Calendar calendar = Calendar.getInstance();
         long formTimestamp = form.getTimestamp();
         long currentTimestamp = calendar.toInstant().getEpochSecond();
@@ -336,5 +336,23 @@ public class PostService {
             errors.put("text", "Текст поста менее 50 символов!");
         }
         return errors;
+    }
+
+    public ResponseEntity<CommentAddResult> commentAdd(Integer parentId, Integer postId, String text, Principal principal) {
+        PostComment parent = null;
+        if (parentId != null) {
+            parent = postCommentsRepository.findPostCommentById(parentId);
+        }
+
+        User user = userRepository.findByEmail(principal.getName()).get();
+        PostComment postComment = new PostComment(
+                parent,
+                postRepository.findPostsById(postId),
+                user,
+                new Date(),
+                text);
+        postCommentsRepository.save(postComment);
+        Optional<PostComment> commentId = postCommentsRepository.findTopByOrderByIdDesc();
+        return ResponseEntity.ok(new CommentAddResult(commentId.get().getId()));
     }
 }

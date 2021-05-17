@@ -1,12 +1,16 @@
 package com.gh4biz.devpub.controllers;
 
+import com.gh4biz.devpub.model.request.CommentAddForm;
 import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -14,6 +18,8 @@ import java.security.Principal;
 @RequestMapping("/api")
 public class ApiPostController {
     private final PostService postService;
+    @Value("${blogCommentTextLength}")
+    private int blogCommentTextLength;
 
     @Autowired
     public ApiPostController(PostService postService) {
@@ -94,5 +100,17 @@ public class ApiPostController {
             @PathVariable int id,
             Principal principal) {
         return postService.postEdit(id, form, principal);
+    }
+
+    @PostMapping("/comment")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<CommentAddResult> commentAdd(
+            @RequestBody CommentAddForm form,
+            Principal principal) {
+        if (form.getText().length() < blogCommentTextLength){
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Текст комментария не задан или слишком короткий!");
+        }
+        return postService.commentAdd(form.getParentId(), form.getPostId(), form.getText(), principal);
     }
 }

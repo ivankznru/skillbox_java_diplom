@@ -25,4 +25,5 @@ blogCopyrightfrom: 2021
 
 blogCaptchaTimeout: 3600
 blogAnnounceTextLimit: 150
+blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728

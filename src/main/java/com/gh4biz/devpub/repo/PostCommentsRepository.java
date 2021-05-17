@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public interface PostCommentsRepository extends CrudRepository<PostComment, Integer> {
     int countAllByPostId(int id);
@@ -20,4 +21,6 @@ public interface PostCommentsRepository extends CrudRepository<PostComment, Inte
     ArrayList<PostComment> findAllByPostId(int id);
 
     PostComment findPostCommentById(int id);
+
+    Optional<PostComment> findTopByOrderByIdDesc();
 }
