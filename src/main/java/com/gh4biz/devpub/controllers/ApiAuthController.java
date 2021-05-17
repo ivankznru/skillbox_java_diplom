@@ -74,6 +74,12 @@ public class ApiAuthController {
         return ResponseEntity.ok(getLoginResponse(principal.getName()));
     }
 
+    @GetMapping("/auth/logout")
+    public ResponseEntity<Result> logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return ResponseEntity.ok(new Result(true));
+    }
+
     private LoginResponse getLoginResponse(String email) {
         com.gh4biz.devpub.model.entity.User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));

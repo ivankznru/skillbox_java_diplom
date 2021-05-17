@@ -8,15 +8,14 @@ spring.jpa.show-sql: false
 server:
   tomcat:
     max-swallow-size: -1
-
+  error:
+    include-message: always
 #spring:
 #  servlet:
 #    multipart:
 #      enabled: true
 #      max-request-size: 5MB
 #      max-file-size: 10MB
-
-
 blogTitle: DevPub
 blogSubtitle: Рассказы разработчиков
 blogPhone: +7 (812) 244-54-32
