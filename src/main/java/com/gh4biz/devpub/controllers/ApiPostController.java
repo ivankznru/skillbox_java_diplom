@@ -1,6 +1,7 @@
 package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.model.request.CommentAddForm;
+import com.gh4biz.devpub.model.request.ModerateForm;
 import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.service.PostService;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @RestController
@@ -107,10 +109,21 @@ public class ApiPostController {
     public ResponseEntity<CommentAddResult> commentAdd(
             @RequestBody CommentAddForm form,
             Principal principal) {
-        if (form.getText().length() < blogCommentTextLength){
+        if (form.getText().length() < blogCommentTextLength) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "Текст комментария не задан или слишком короткий!");
         }
         return postService.commentAdd(form.getParentId(), form.getPostId(), form.getText(), principal);
+    }
+
+    @PostMapping("/moderation")
+    @PreAuthorize("hasAuthority('user:moderate')")
+    public ResponseEntity<Result> postModerate(
+            @RequestBody ModerateForm form,
+            Principal principal) {
+        int postId = form.getPostId();
+        String decision = form.getDecision();
+        postService.moderate(postId, decision, principal);
+        return ResponseEntity.ok(new Result(true));
     }
 }

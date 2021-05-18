@@ -355,4 +355,23 @@ public class PostService {
         Optional<PostComment> commentId = postCommentsRepository.findTopByOrderByIdDesc();
         return ResponseEntity.ok(new CommentAddResult(commentId.get().getId()));
     }
+
+    public boolean moderate(int postId, String decision, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).get();
+        Post post = postRepository.findPostsById(postId);
+        if (user.getIsModerator() != 1) {
+            return false;
+        }
+        post.setModerator(user);
+        if (decision.equals("accept")) {
+            post.setStatus(ModerationStatus.ACCEPTED);
+        }
+
+        if (decision.equals("decline")) {
+            post.setStatus(ModerationStatus.DECLINED);
+        }
+
+        postRepository.save(post);
+        return true;
+    }
 }

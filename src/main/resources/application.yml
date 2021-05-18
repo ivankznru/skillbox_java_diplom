@@ -27,3 +27,5 @@ blogCaptchaTimeout: 3600
 blogAnnounceTextLimit: 150
 blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
+
+blogImageFolder: C:\Users\vkotov\IdeaProjects\devpub\src\main\resources\static\img

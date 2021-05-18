@@ -75,9 +75,11 @@ public class ApiAuthController {
     }
 
     @GetMapping("/auth/logout")
-    public ResponseEntity<Result> logout() {
-        SecurityContextHolder.getContext().setAuthentication(null);
-        return ResponseEntity.ok(new Result(true));
+    public String logout() {
+        SecurityContextHolder
+                .getContext()
+                .setAuthentication(null);
+        return "redirect:/";
     }
 
     private LoginResponse getLoginResponse(String email) {

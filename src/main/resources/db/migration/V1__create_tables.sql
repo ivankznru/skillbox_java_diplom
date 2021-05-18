@@ -12,7 +12,7 @@ CREATE TABLE `users` (
 CREATE TABLE `posts` (
   `id` int PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `is_active` tinyint NOT NULL,
-  `status` ENUM ('NEW', 'ACCEPTED', 'DECLINE'),
+  `status` ENUM ('NEW', 'ACCEPTED', 'DECLINED'),
   `moderator_id` int,
   `user_id` int,
   `time` datetime NOT NULL,
