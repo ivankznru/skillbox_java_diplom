@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class RegisterResult {
     private boolean result;
-    private RegError errors;
+    private RegErrors errors;
 
-    public RegisterResult(boolean result, RegError errors) {
+    public RegisterResult(boolean result, RegErrors errors) {
         this.result = result;
         this.errors = errors;
     }

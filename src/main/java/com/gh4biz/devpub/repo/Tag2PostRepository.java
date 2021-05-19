@@ -1,11 +1,13 @@
 package com.gh4biz.devpub.repo;
 
+import com.gh4biz.devpub.model.entity.Tag;
 import com.gh4biz.devpub.model.entity.Tag2Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public interface Tag2PostRepository extends CrudRepository<Tag2Post ,Integer> {
 
@@ -23,4 +25,8 @@ public interface Tag2PostRepository extends CrudRepository<Tag2Post ,Integer> {
 
     @Query("SELECT tag.id FROM Tag2Post WHERE post.isActive = 1 GROUP BY tag.id ORDER BY count(*) DESC")
     ArrayList<Integer> getOrderedTags();
+
+    ArrayList<Tag2Post> findAllByPostId(int postId);
+
+    //Optional<Tag> getT
 }

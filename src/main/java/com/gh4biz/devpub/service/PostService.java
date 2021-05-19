@@ -194,8 +194,8 @@ public class PostService {
         return new PostsResponse(count, postAnnotationResponseList);
     }
 
-    public PostResponse getPostById(int id) {
-        Post post = postRepository.findPostsById(id);
+    public PostResponse getPostById(int postId) {
+        Post post = postRepository.findPostsById(postId);
         PostResponse postResponse = new PostResponse();
 
         postResponse.setId(post.getId());
@@ -207,11 +207,23 @@ public class PostService {
                 post.getUser().getId(),
                 post.getUser().getName()));
         postResponse.setTitle(post.getTitle());
+
+        //System.out.println(post.getText());
+
         postResponse.setText(post.getText());
         postResponse.setLikeCount(getVoteCount(post, 1));
         postResponse.setLikeCount(getVoteCount(post, -1));
         postResponse.setViewCount(post.getViewCount());
-        postResponse.setComments(getComments(id));
+        postResponse.setComments(getComments(postId));
+
+        ArrayList<String> tags = new ArrayList<>();
+        for (Tag2Post tag2Post : tag2PostRepository.findAllByPostId(postId)) {
+            Tag tag = tagRepository.findById(tag2Post.getTag().getId()).get();
+            tags.add(tag.getName());
+        }
+        postResponse.setTags(tags);
+        //  postResponse.setPost(post);
+
         return postResponse;
     }
 
@@ -266,11 +278,11 @@ public class PostService {
         return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
     }
 
-    public ResponseEntity<PostUpdateEditUploadErrorsResponse> postAdd(PostEditForm form, Principal principal) {
+    public ResponseEntity<PostUpdateEditResponse> postAdd(PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
 
         if (!checkPost(form).isEmpty()) {
-            return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, checkPost(form)));
+            return ResponseEntity.ok(new PostUpdateEditResponse(false, checkPost(form)));
         }
 
         Post post = new Post(
@@ -288,13 +300,13 @@ public class PostService {
                     new Tag2Post(post, new Tag(tagName));
             tag2PostRepository.save(tag2Post);
         }
-        return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(true));
+        return ResponseEntity.ok(new PostUpdateEditResponse(true));
     }
 
-    public ResponseEntity<PostUpdateEditUploadErrorsResponse> postEdit(int id, PostEditForm form, Principal principal) {
+    public ResponseEntity<PostUpdateEditResponse> postEdit(int id, PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
         if (!checkPost(form).isEmpty()) {
-            return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(false, checkPost(form)));
+            return ResponseEntity.ok(new PostUpdateEditResponse(false, checkPost(form)));
         }
 
         Post post = postRepository.findPostsById(id);
@@ -316,7 +328,7 @@ public class PostService {
             tag2PostRepository.save(tag2Post);
         }
 
-        return ResponseEntity.ok(new PostUpdateEditUploadErrorsResponse(true));
+        return ResponseEntity.ok(new PostUpdateEditResponse(true));
     }
 
     private HashMap<String, String> checkPost(PostEditForm form) {

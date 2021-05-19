@@ -7,11 +7,11 @@ import java.util.Map;
 
 @Data
 @AllArgsConstructor
-public class PostUpdateEditUploadErrorsResponse {
+public class PostUpdateEditResponse {
     private boolean result;
     private Map<String, String> errors;
 
-    public PostUpdateEditUploadErrorsResponse(boolean result) {
+    public PostUpdateEditResponse(boolean result) {
         this.result = result;
     }
 }

@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
 @RestController
-public class ImageController {
+public class ApiImageController {
     @Value("${blogImageFolder}")
     private String blogImageFolder;
 

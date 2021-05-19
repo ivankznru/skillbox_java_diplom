@@ -1,6 +1,8 @@
 package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.TagWeight;
+import com.gh4biz.devpub.model.entity.Tag;
+import com.gh4biz.devpub.model.entity.Tag2Post;
 import com.gh4biz.devpub.model.response.TagResponse;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.Tag2PostRepository;
@@ -41,5 +43,9 @@ public class TagService {
         }
         tagResponse.setTagsList(tagWeights);
         return tagResponse;
+    }
+
+    public ArrayList<Tag2Post> getTagsByPostId(int postId){
+       return tag2PostRepository.findAllByPostId(postId);
     }
 }

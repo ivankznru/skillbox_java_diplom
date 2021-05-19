@@ -1,8 +1,11 @@
 package com.gh4biz.devpub.model.response;
 
+import com.gh4biz.devpub.model.entity.Post;
+import com.gh4biz.devpub.model.entity.Tag;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class PostResponse {
@@ -16,6 +19,7 @@ public class PostResponse {
     private int dislikeCount;
     private int viewCount;
     private ArrayList<CommentResponse> comments;
-//    private List<String> tags;
-//    private Post post;
+
+    private List<String> tags;
+    //private Post post;
 }

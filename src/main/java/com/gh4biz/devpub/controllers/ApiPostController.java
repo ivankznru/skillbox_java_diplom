@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @RestController
@@ -89,7 +88,7 @@ public class ApiPostController {
 
     @PostMapping("/post")
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<PostUpdateEditUploadErrorsResponse> postAdd(
+    public ResponseEntity<PostUpdateEditResponse> postAdd(
             @RequestBody PostEditForm form,
             Principal principal) {
         return postService.postAdd(form, principal);
@@ -97,7 +96,7 @@ public class ApiPostController {
 
     @PutMapping("/post/{id}")
     @PreAuthorize("hasAuthority('user:write')")
-    public ResponseEntity<PostUpdateEditUploadErrorsResponse> postEdit(
+    public ResponseEntity<PostUpdateEditResponse> postEdit(
             @RequestBody PostEditForm form,
             @PathVariable int id,
             Principal principal) {
