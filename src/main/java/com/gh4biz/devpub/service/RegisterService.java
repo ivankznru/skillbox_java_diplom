@@ -74,18 +74,19 @@ public class RegisterService {
                                    ProfileEditForm form,
                                    Principal principal) {
 
-        System.out.println(photo);
         User user = userRepository.findByEmail(principal.getName()).get();
         HashMap<String, String> errors = new HashMap<>();
         boolean emailChanged = !principal.getName().equals(form.getEmail());
+
         if (emailChanged &
                 userRepository.findByEmail(form.getEmail()).isPresent()) {
             errors.put("email", "Этот e-mail уже зарегистрирован!");
             return new ProfileEdit(false, errors);
         }
 
-        if (!form.getEmail().equals(principal.getName())){
+        if (!form.getEmail().equals(principal.getName())) {
             user.setEmail(form.getEmail());
+
             userRepository.save(user);
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(form.getEmail(), user.getPassword()));
@@ -96,13 +97,20 @@ public class RegisterService {
             errors.put("name", "Имя указано неверно!");
             return new ProfileEdit(false, errors);
         }
+
         user.setName(form.getName());
 
         if (form.getPassword() != null)
+            user.setName(form.getName());
+
+        if (form.getPassword() != null)
             user.setPassword(
-                    new BCryptPasswordEncoder().encode(form.getPassword()));
+                    new BCryptPasswordEncoder().
+                            encode(form.getPassword()));
         userRepository.save(user);
-        return new ProfileEdit(true);
+        return new
+
+                ProfileEdit(true);
     }
 
     private void saveAvatar(MultipartFile photo) {
