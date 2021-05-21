@@ -17,7 +17,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -58,6 +60,17 @@ public class ApiAuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        if (userRepository.findByEmail(loginRequest.getEmail()).isEmpty()){
+            return ResponseEntity.ok(new LoginResponse(false));
+        }
+
+        com.gh4biz.devpub.model.entity.User tryLoginUser = userRepository.findByEmail(loginRequest.getEmail()).get();
+        String tryPassHash = new BCryptPasswordEncoder().encode(loginRequest.getPassword());
+        boolean passwordCorrect = new BCryptPasswordEncoder().matches(tryLoginUser.getPassword(), tryPassHash);
+        if (!passwordCorrect){
+            return ResponseEntity.ok(new LoginResponse(false));
+        }
+        
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -76,15 +89,16 @@ public class ApiAuthController {
 
     @GetMapping("/auth/logout")
     public String logout() {
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(null);
-        return "redirect:/";
+        SecurityContextHolder.clearContext();
+//                .getContext()
+//                .setAuthentication(null);
+        return "ya.ru";
     }
 
     private LoginResponse getLoginResponse(String email) {
         com.gh4biz.devpub.model.entity.User currentUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
+
         UserLoginResponse userResponse = new UserLoginResponse();
         userResponse.setEmail(currentUser.getEmail());
         userResponse.setModeration(currentUser.getIsModerator() == 1);

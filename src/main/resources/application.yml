@@ -29,3 +29,5 @@ blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
 
 blogImageFolder: C:\Users\vkotov\IdeaProjects\devpub\src\main\resources\static\img
+blogAvatarHeight: 36
+blogAvatarWidth: 36

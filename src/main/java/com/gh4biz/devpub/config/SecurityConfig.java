@@ -41,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .logout()
 //                .logoutUrl("/api/auth/logout")
 //                .logoutSuccessUrl("/")
+//                .invalidateHttpSession(true)
+//                .deleteCookies("JSESSIONID")
         ;
     }
 

@@ -9,4 +9,16 @@ public class LoginResponse {
 
     @JsonProperty("user")
     private UserLoginResponse userLoginResponse;
+
+    public LoginResponse(boolean result) {
+        this.result = result;
+    }
+
+    public LoginResponse(boolean result, UserLoginResponse userLoginResponse) {
+        this.result = result;
+        this.userLoginResponse = userLoginResponse;
+    }
+
+    public LoginResponse() {
+    }
 }
