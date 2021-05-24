@@ -9,7 +9,10 @@ import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.ProfileEdit;
 import com.gh4biz.devpub.repo.CaptchaRepository;
 import com.gh4biz.devpub.repo.UserRepository;
+import net.bytebuddy.utility.RandomString;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,9 +20,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.DigestUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 @Service
@@ -27,6 +43,12 @@ public class RegisterService {
     private final UserRepository userRepository;
     private final CaptchaRepository captchaRepository;
     private final AuthenticationManager authenticationManager;
+
+    @Value("${blogImageDBPathFolder}")
+    private String blogImageDBPathFolder;
+
+    @Value("${blogImageRealPathFolder}")
+    private String blogImageRealPathFolder;
 
     @Value("${blogAvatarHeight}")
     private int blogAvatarHeight;
@@ -37,7 +59,9 @@ public class RegisterService {
     @Value("${blogUploadImageSizeLimit}")
     private int blogUploadImageSizeLimit;
 
-    public RegisterService(UserRepository userRepository, CaptchaRepository captchaRepository, AuthenticationManager authenticationManager) {
+    public RegisterService(UserRepository userRepository,
+                           CaptchaRepository captchaRepository,
+                           AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.captchaRepository = captchaRepository;
         this.authenticationManager = authenticationManager;
@@ -70,11 +94,16 @@ public class RegisterService {
         return ResponseEntity.ok(new RegisterResult(true));
     }
 
-    public ProfileEdit editProfile(MultipartFile photo,
-                                   ProfileEditForm form,
+    public ProfileEdit editProfile(ProfileEditForm form,
+                                   //ProfileEditForm photo,
                                    Principal principal) {
 
+
         User user = userRepository.findByEmail(principal.getName()).get();
+//        if (photo.getPhoto() != null) {
+//            saveAvatar(user, photo.getPhoto());
+//        }
+
         HashMap<String, String> errors = new HashMap<>();
         boolean emailChanged = !principal.getName().equals(form.getEmail());
 
@@ -108,17 +137,57 @@ public class RegisterService {
                     new BCryptPasswordEncoder().
                             encode(form.getPassword()));
         userRepository.save(user);
-        return new
-
-                ProfileEdit(true);
+        return new ProfileEdit(true);
     }
 
-    private void saveAvatar(MultipartFile photo) {
-        // проверим размер и если не такой то ресайзнем а затем сохраним
+    public ProfileEdit editAvatar(MultipartFile photo, Principal principal) throws IOException {
+        if (!photo.getContentType().equals("image/png") &&
+                !photo.getContentType().equals("image/jpg") &&
+                !photo.getContentType().equals("image/jpeg")
+        ) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "неподдерживаемый тип файла!");
+        }
+
+        User user = userRepository.findByEmail(principal.getName()).get();
+        saveAvatar(photo, user);
+
+        return new ProfileEdit(true);
     }
 
-    private void imageResize() {
-        // сделаем изображение правильного размера
+    private BufferedImage resizeImage(BufferedImage originalImage, int type) {
+        BufferedImage resizedImage = new BufferedImage(blogAvatarWidth, blogAvatarHeight, type);
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, blogAvatarWidth, blogAvatarHeight, null);
+        g.dispose();
+        g.setComposite(AlphaComposite.Src);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        return resizedImage;
+    }
+
+    private void saveAvatar(MultipartFile file, User user) throws IOException {
+        BufferedImage bufferedImage = ImageIO.read(file.getInputStream());
+        if ((bufferedImage.getHeight() > blogAvatarWidth) | (bufferedImage.getWidth() > blogAvatarHeight)) {
+            bufferedImage = resizeImage(bufferedImage, BufferedImage.TYPE_INT_RGB);
+        }
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        String fileName =  generateKey(file.getOriginalFilename())+ "." + extension;
+        String path = blogImageRealPathFolder + File.separator + fileName;
+        String dbPath = blogImageDBPathFolder + File.separator + fileName;
+
+        File outputFile = new File(path);
+        ImageIO.write(bufferedImage, extension, outputFile);
+        user.setPhoto(File.separator + dbPath);
+        userRepository.save(user);
+    }
+
+    private String generateKey(String name) {
+        return DigestUtils.md5DigestAsHex((name + LocalDateTime.now()).getBytes(StandardCharsets.UTF_8));
     }
 
 }

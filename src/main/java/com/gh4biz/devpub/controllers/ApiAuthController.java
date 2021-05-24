@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -32,6 +33,9 @@ public class ApiAuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     public ApiAuthController(
@@ -59,14 +63,14 @@ public class ApiAuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+
         if (userRepository.findByEmail(loginRequest.getEmail()).isEmpty()){
             return ResponseEntity.ok(new LoginResponse(false));
         }
 
         com.gh4biz.devpub.model.entity.User tryLoginUser = userRepository.findByEmail(loginRequest.getEmail()).get();
-        String tryPassHash = new BCryptPasswordEncoder().encode(loginRequest.getPassword());
-        boolean passwordCorrect = new BCryptPasswordEncoder().matches(tryLoginUser.getPassword(), tryPassHash);
-        if (!passwordCorrect){
+
+        if(!passwordEncoder.matches(loginRequest.getPassword(), tryLoginUser.getPassword())) {
             return ResponseEntity.ok(new LoginResponse(false));
         }
         

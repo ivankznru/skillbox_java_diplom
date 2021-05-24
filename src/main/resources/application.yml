@@ -28,6 +28,9 @@ blogAnnounceTextLimit: 150
 blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
 
-blogImageFolder: C:\Users\vkotov\IdeaProjects\devpub\src\main\resources\static\img
+blogImageDBPathFolder: resources\static\img
+blogImageRealPathFolder: src\main\resources\static\img
+
 blogAvatarHeight: 36
 blogAvatarWidth: 36
+

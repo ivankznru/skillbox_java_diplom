@@ -24,14 +24,16 @@ import java.time.LocalDateTime;
 
 @RestController
 public class ApiImageController {
-    @Value("${blogImageFolder}")
-    private String blogImageFolder;
+    @Value("${blogImageRealPathFolder}")
+    private String blogImageRealPathFolder;
+
+    @Value("${blogImageDBPathFolder}")
+    private String blogImageDBPathFolder;
 
     @RequestMapping(value = "/api/image", method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('user:write')")
     public String uploadFile(MultipartFile image) throws IOException {
-        String save = saveUploadedFile(image);
-        return save;
+        return saveUploadedFile(image);
     }
 
     @GetMapping("/resources/static/img/{f1}/{f2}/{f3}/{filename:.+}")
@@ -42,29 +44,24 @@ public class ApiImageController {
             @PathVariable String f3,
             @PathVariable String filename) throws MalformedURLException {
 
-        String file =
-                blogImageFolder.concat("\\").
+        return ResponseEntity.ok(loadAsResource(
+                blogImageRealPathFolder.concat("\\").
                         concat(f1).concat("\\").
                         concat(f2).concat("\\").
                         concat(f3).concat("\\").
-                        concat(filename);
-
-        return ResponseEntity.ok(loadAsResource(file));
+                        concat(filename)));
     }
 
     @GetMapping("/resources/static/img/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getAvatar(
             @PathVariable String filename) throws MalformedURLException {
-        return ResponseEntity.ok(loadAsResource(filename));
+        return ResponseEntity.ok(loadAsResource(blogImageRealPathFolder + File.separator + filename));
     }
 
     public Resource loadAsResource(String filename) throws MalformedURLException {
-        Path p = Paths.get(blogImageFolder);
-        Path file = p.resolve(filename);
-
-        Resource resource = new UrlResource(file.toUri());
-        //System.out.println(resource);
+        Path p = Paths.get(filename);
+        Resource resource = new UrlResource(p.toUri());
         if (resource.exists() || resource.isReadable()) {
             return resource;
         } else {
@@ -83,23 +80,24 @@ public class ApiImageController {
         }
 
         RandomString randomString = new RandomString(2);
-        String currentDir = blogImageFolder;
+        String newImgDir = "";
+
         for (int i = 0; i < 3; i++) {
-            currentDir += File.separator.concat(randomString.nextString());
-            if (!Files.exists(Paths.get(currentDir))) {
-                Files.createDirectory(Paths.get(currentDir));
+            newImgDir = newImgDir + File.separator + randomString.nextString();
+            if (!Files.exists(Paths.get(blogImageRealPathFolder + newImgDir))) {
+                Files.createDirectory(Paths.get(blogImageRealPathFolder + newImgDir));
             }
         }
 
-        // System.out.println(file.getOriginalFilename());
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
         if (!file.isEmpty()) {
             byte[] bytes = file.getBytes();
+            String fileName = generateKey(file.getOriginalFilename()) + "." + extension;
 
-            Path path = Paths.get(currentDir + File.separator + generateKey(file.getOriginalFilename()) + "." + extension);
+            Path path = Paths.get(blogImageRealPathFolder + newImgDir + File.separator + fileName);
             Files.write(path, bytes);
-            return path.toString();
+            return blogImageDBPathFolder + newImgDir + File.separator + fileName;
         }
         return "неизвестная ошибка";
     }
