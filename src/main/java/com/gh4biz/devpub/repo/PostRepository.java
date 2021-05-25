@@ -11,6 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 
 public interface PostRepository extends CrudRepository<Post, Integer> {
 
@@ -46,4 +47,10 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     int countByIsActiveAndStatusAndUser(Integer isActive, ModerationStatus status, User user);
     Slice<Post> findAllByIsActiveAndStatusAndUserOrderByTimeDesc(int isActive, ModerationStatus status, User user, Pageable pageable);
 
+    int countByIsActiveAndUser(int isActive, User user);
+
+    @Query("SELECT SUM(viewCount) FROM Post WHERE isActive = 1 and user LIKE ?1")
+    int countViews(User user);
+
+    Post findFirstByUserOrderByTime(User user);
 }
