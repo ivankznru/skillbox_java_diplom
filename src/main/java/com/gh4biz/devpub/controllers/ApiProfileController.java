@@ -36,7 +36,6 @@ public class ApiProfileController {
     public ResponseEntity<ProfileEdit> saveAva(
             @RequestPart(value = "photo", required = false) MultipartFile photo,
             Principal principal) throws IOException {
-
         return ResponseEntity.ok(registerService.editAvatar(photo, principal));
 //        return ResponseEntity.ok(registerService.editProfile(photo, photo, principal));
     }

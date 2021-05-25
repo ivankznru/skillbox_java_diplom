@@ -75,6 +75,13 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.1</version> <!-- makesure correct version here -->
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
+        <dependency>
+            <groupId>org.imgscalr</groupId>
+            <artifactId>imgscalr-lib</artifactId>
+            <version>4.2</version>
+        </dependency>
+
 
     </dependencies>
 

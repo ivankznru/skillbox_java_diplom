@@ -11,6 +11,7 @@ import com.gh4biz.devpub.repo.CaptchaRepository;
 import com.gh4biz.devpub.repo.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.FilenameUtils;
+import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,14 +96,19 @@ public class RegisterService {
     }
 
     public ProfileEdit editProfile(ProfileEditForm form,
-                                   //ProfileEditForm photo,
                                    Principal principal) {
 
 
         User user = userRepository.findByEmail(principal.getName()).get();
-//        if (photo.getPhoto() != null) {
-//            saveAvatar(user, photo.getPhoto());
-//        }
+        if (form.getRemovePhoto() == 1) {
+            String path = "src\\main" + user.getPhoto();
+            File file = new File(path);
+            System.out.println(path);
+            if(file.delete()){
+                user.setPhoto("");
+                userRepository.save(user);
+            }
+        }
 
         HashMap<String, String> errors = new HashMap<>();
         boolean emailChanged = !principal.getName().equals(form.getEmail());
@@ -156,18 +162,9 @@ public class RegisterService {
     }
 
     private BufferedImage resizeImage(BufferedImage originalImage, int type) {
-        BufferedImage resizedImage = new BufferedImage(blogAvatarWidth, blogAvatarHeight, type);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, blogAvatarWidth, blogAvatarHeight, null);
-        g.dispose();
-        g.setComposite(AlphaComposite.Src);
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        return resizedImage;
+        Dimension newMaxSize = new Dimension(blogAvatarHeight, blogAvatarWidth);
+        BufferedImage resizedImg = Scalr.resize(originalImage, Scalr.Method.QUALITY, newMaxSize.width, newMaxSize.height);
+        return resizedImg;
     }
 
     private void saveAvatar(MultipartFile file, User user) throws IOException {

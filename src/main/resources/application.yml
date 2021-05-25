@@ -31,6 +31,6 @@ blogUploadImageSizeLimit: 3145728
 blogImageDBPathFolder: resources\static\img
 blogImageRealPathFolder: src\main\resources\static\img
 
-blogAvatarHeight: 36
-blogAvatarWidth: 36
+blogAvatarHeight: 100
+blogAvatarWidth: 100
 
