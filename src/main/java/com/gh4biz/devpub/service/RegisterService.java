@@ -4,9 +4,11 @@ import com.gh4biz.devpub.model.RegErrors;
 import com.gh4biz.devpub.model.RegisterResult;
 import com.gh4biz.devpub.model.entity.CaptchaCode;
 import com.gh4biz.devpub.model.entity.User;
+import com.gh4biz.devpub.model.request.ChangePasswordForm;
 import com.gh4biz.devpub.model.request.ProfileEditForm;
 import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.ProfileEdit;
+import com.gh4biz.devpub.model.response.Result;
 import com.gh4biz.devpub.repo.CaptchaRepository;
 import com.gh4biz.devpub.repo.UserRepository;
 import net.bytebuddy.utility.RandomString;
@@ -22,22 +24,23 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.imageio.ImageIO;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.Properties;
 
 @Service
 public class RegisterService {
@@ -57,8 +60,14 @@ public class RegisterService {
     @Value("${blogAvatarWidth}")
     private int blogAvatarWidth;
 
-    @Value("${blogUploadImageSizeLimit}")
-    private int blogUploadImageSizeLimit;
+    @Value("${blogEmailUser}")
+    private String blogEmailUser;
+
+    @Value("${blogEmailPassword}")
+    private String blogEmailPassword;
+
+    @Value("${blogUrl}")
+    private String blogUrl;
 
     public RegisterService(UserRepository userRepository,
                            CaptchaRepository captchaRepository,
@@ -70,10 +79,8 @@ public class RegisterService {
 
 
     public ResponseEntity<RegisterResult> register(RegisterForm form) {
-        CaptchaCode captcha = captchaRepository.findBySecretCode(form.getSecret());
         RegErrors regErrors = new RegErrors();
-
-        if (!form.getCaptcha().equals(captcha.getCode())) {
+        if (!checkCaptcha(form.getSecret())) {
             regErrors.setCaptcha("Код с картинки введён неверно");
             return ResponseEntity.ok(new RegisterResult(false, regErrors));
         }
@@ -95,16 +102,22 @@ public class RegisterService {
         return ResponseEntity.ok(new RegisterResult(true));
     }
 
+    private boolean checkCaptcha(String secret) {
+        CaptchaCode captcha = captchaRepository.findBySecretCode(secret);
+        if (!secret.equals(captcha.getSecretCode())) {
+            return false;
+        }
+        return true;
+    }
+
     public ProfileEdit editProfile(ProfileEditForm form,
                                    Principal principal) {
-
-
         User user = userRepository.findByEmail(principal.getName()).get();
         if (form.getRemovePhoto() == 1) {
             String path = "src\\main" + user.getPhoto();
             File file = new File(path);
             System.out.println(path);
-            if(file.delete()){
+            if (file.delete()) {
                 user.setPhoto("");
                 userRepository.save(user);
             }
@@ -173,7 +186,7 @@ public class RegisterService {
             bufferedImage = resizeImage(bufferedImage, BufferedImage.TYPE_INT_RGB);
         }
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String fileName =  generateKey(file.getOriginalFilename())+ "." + extension;
+        String fileName = generateKey(file.getOriginalFilename()) + "." + extension;
         String path = blogImageRealPathFolder + File.separator + fileName;
         String dbPath = blogImageDBPathFolder + File.separator + fileName;
 
@@ -187,4 +200,63 @@ public class RegisterService {
         return DigestUtils.md5DigestAsHex((name + LocalDateTime.now()).getBytes(StandardCharsets.UTF_8));
     }
 
+    public Result restore(String email) {
+        RandomString randomString = new RandomString(30);
+        String code = randomString.nextString();
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = userRepository.findByEmail(email).get();
+            user.setCode(code);
+            sendMail(email, code);
+            userRepository.save(user);
+            return new Result(true);
+        }
+        return new Result(false);
+    }
+
+    private void sendMail(String email, String code) {
+        String from = blogEmailUser;
+        String host = "smtp.beget.com";
+
+        Properties properties = System.getProperties();
+        // Setup mail server
+        properties.put("mail.smtp.host", host);
+        properties.put("mail.smtp.port", "465");
+        properties.put("mail.smtp.ssl.enable", "true");
+        properties.put("mail.smtp.auth", "true");
+
+        Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(blogEmailUser, blogEmailPassword);
+            }
+        });
+
+        try {
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
+            message.setSubject("Devpub: Восстановление пароля");
+            message.setText(blogUrl + "/login/change-password/" + code);
+            Transport.send(message);
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
+    }
+
+    public RegisterResult changePassword(ChangePasswordForm changePasswordForm) {
+        if (!checkCaptcha(changePasswordForm.getCaptchaSecret())){
+            RegErrors regErrors = new RegErrors();
+            regErrors.setCaptcha("Неверный код");
+            return new RegisterResult(false, regErrors);
+        }
+        Optional<User> optionalUser = userRepository.findUserByCode(changePasswordForm.getCode());
+        if (optionalUser.isEmpty()){
+            return new RegisterResult(false);
+        }
+        User user = optionalUser.get();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+        user.setPassword(encoder.encode(changePasswordForm.getPassword()));
+        userRepository.save(user);
+        return new RegisterResult(true);
+    }
 }

@@ -3,6 +3,8 @@ package com.gh4biz.devpub.controllers;
 import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.request.LoginRequest;
 import com.gh4biz.devpub.model.request.RegisterForm;
+import com.gh4biz.devpub.model.request.RestoreForm;
+import com.gh4biz.devpub.model.request.ChangePasswordForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.model.RegisterResult;
 import com.gh4biz.devpub.repo.PostRepository;
@@ -17,7 +19,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,9 +34,8 @@ public class ApiAuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final  PasswordEncoder passwordEncoder;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @Autowired
     public ApiAuthController(
@@ -43,12 +43,13 @@ public class ApiAuthController {
             RegisterService registerService,
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
-            PostRepository postRepository) {
+            PostRepository postRepository, PasswordEncoder passwordEncoder) {
         this.captchaService = captchaService;
         this.registerService = registerService;
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.postRepository = postRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/auth/captcha")
@@ -92,10 +93,18 @@ public class ApiAuthController {
 
     @GetMapping("/auth/logout")
     public String logout() {
-        SecurityContextHolder.clearContext();
-//                .getContext()
-//                .setAuthentication(null);
-        return "ya.ru";
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return "index";
+    }
+
+    @PostMapping("/auth/restore")
+    public ResponseEntity<Result> restore(@RequestBody RestoreForm restoreForm) {
+        return ResponseEntity.ok(registerService.restore(restoreForm.getEmail()));
+    }
+
+    @PostMapping("/auth/password")
+    public ResponseEntity<RegisterResult> passwordChange(@RequestBody ChangePasswordForm changePasswordForm) {
+        return ResponseEntity.ok(registerService.changePassword(changePasswordForm));
     }
 
     private LoginResponse getLoginResponse(String email) {
