@@ -1,5 +1,6 @@
 package com.gh4biz.devpub.repo;
 
+import com.gh4biz.devpub.model.entity.Post;
 import com.gh4biz.devpub.model.entity.PostVote;
 import com.gh4biz.devpub.model.entity.User;
 import com.gh4biz.devpub.model.response.VoteCount;
@@ -7,6 +8,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.Optional;
 
 public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
     int countAllByPostIdAndValue(int id, int value);
@@ -19,4 +22,7 @@ public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
 
     int countByValue(int value);
 
+    Optional<PostVote> findByValueAndUserAndPost(int value, User user, Post post);
+
+    Optional<PostVote> findByUserAndPost(User user, Post post);
 }

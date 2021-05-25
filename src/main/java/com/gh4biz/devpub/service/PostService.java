@@ -2,6 +2,7 @@ package com.gh4biz.devpub.service;
 
 import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.entity.*;
+import com.gh4biz.devpub.model.request.VoteForm;
 import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.*;
@@ -386,4 +387,35 @@ public class PostService {
         postRepository.save(post);
         return true;
     }
+
+    public boolean like(VoteForm form, Principal principal) {
+        return vote(1, form, principal);
+    }
+
+    public boolean dislike(VoteForm form, Principal principal) {
+        return vote(-1, form, principal);
+    }
+
+    private boolean vote(int vote, VoteForm form, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName()).get();
+        Post post = postRepository.findPostsById(form.getPostId());
+        Optional<PostVote> optionalPostVote = postVotesRepository.findByUserAndPost(user, post);
+        if (optionalPostVote.isEmpty()) {
+            PostVote postVote = new PostVote();
+            postVote.setPost(post);
+            postVote.setUser(user);
+            postVote.setTime(new Date());
+            postVote.setValue(vote);
+            postVotesRepository.save(postVote);
+            return true;
+        }
+        PostVote postVote = optionalPostVote.get();
+        if (postVote.getValue() == vote) {
+            return false;
+        }
+        postVote.setValue(vote);
+        postVotesRepository.save(postVote);
+        return true;
+    }
+
 }

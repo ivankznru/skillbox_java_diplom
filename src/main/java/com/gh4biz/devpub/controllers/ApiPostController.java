@@ -1,6 +1,7 @@
 package com.gh4biz.devpub.controllers;
 
 import com.gh4biz.devpub.model.request.CommentAddForm;
+import com.gh4biz.devpub.model.request.VoteForm;
 import com.gh4biz.devpub.model.request.ModerateForm;
 import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
@@ -125,4 +126,22 @@ public class ApiPostController {
         postService.moderate(postId, decision, principal);
         return ResponseEntity.ok(new Result(true));
     }
+
+    @PostMapping("/post/like")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<Result> like(
+            @RequestBody VoteForm form,
+            Principal principal) {
+        return ResponseEntity.ok(new Result(postService.like(form, principal)));
+    }
+
+    @PostMapping("/post/dislike")
+    @PreAuthorize("hasAuthority('user:write')")
+    public ResponseEntity<Result> dislike(
+            @RequestBody VoteForm form,
+            Principal principal) {
+        return ResponseEntity.ok(new Result(postService.dislike(form, principal)));
+    }
+
+
 }
