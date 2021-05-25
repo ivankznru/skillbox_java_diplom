@@ -16,4 +16,7 @@ public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
     Slice<VoteCount> countTotalVote(int value, Pageable pageable);
 
     int countByUserAndValue(User user, int value);
+
+    int countByValue(int value);
+
 }

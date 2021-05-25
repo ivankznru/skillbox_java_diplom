@@ -1,6 +1,6 @@
 package com.gh4biz.devpub.controllers;
 
-import com.gh4biz.devpub.model.MyStatistics;
+import com.gh4biz.devpub.model.Statistics;
 import com.gh4biz.devpub.model.entity.User;
 import com.gh4biz.devpub.repo.PostRepository;
 import com.gh4biz.devpub.repo.PostVotesRepository;
@@ -31,38 +31,31 @@ public class ApiStatisticsController {
 
     @GetMapping("/statistics/my")
     @PreAuthorize("hasAuthority('user:write')")
-    public MyStatistics myStatistics(Principal principal) {
+    public Statistics myStatistics(Principal principal) {
         Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
 
-        MyStatistics myStatistics = new MyStatistics();
+        Statistics myStatistics = new Statistics();
         if (optionalUser.isPresent()) {
             User user = userRepository.findByEmail(principal.getName()).get();
             myStatistics.setPostsCount(postRepository.countByIsActiveAndUser(1, user));
             myStatistics.setLikesCount(postVotesRepository.countByUserAndValue(user, 1));
             myStatistics.setDislikesCount(postVotesRepository.countByUserAndValue(user, -1));
             myStatistics.setViewsCount(postRepository.countViews(user));
-            myStatistics.setFirstPublication(postRepository.findFirstByUserOrderByTime(user).getTime().getTime() / 1000);
+            myStatistics.setFirstPublication(postRepository.findFirstByUserAndIsActiveOrderByTime(user, 1).getTime().getTime() / 1000);
 
             return myStatistics;
         }
-        return new MyStatistics();
+        return new Statistics();
     }
 
     @GetMapping("/statistics/all")
-    public MyStatistics allStatistics(Principal principal) {
-        Optional<User> optionalUser = userRepository.findByEmail(principal.getName());
-
-        MyStatistics myStatistics = new MyStatistics();
-        if (optionalUser.isPresent()) {
-            User user = userRepository.findByEmail(principal.getName()).get();
-            myStatistics.setPostsCount(postRepository.countByIsActiveAndUser(1, user));
-            myStatistics.setLikesCount(postVotesRepository.countByUserAndValue(user, 1));
-            myStatistics.setDislikesCount(postVotesRepository.countByUserAndValue(user, -1));
-            myStatistics.setViewsCount(postRepository.countViews(user));
-            myStatistics.setFirstPublication(postRepository.findFirstByUserOrderByTime(user).getTime().getTime() / 1000);
-
-            return myStatistics;
-        }
-        return new MyStatistics();
+    public Statistics allStatistics() {
+        Statistics statistics = new Statistics();
+        statistics.setPostsCount(postRepository.countAllByIsActive(1));
+        statistics.setLikesCount(postVotesRepository.countByValue(1));
+        statistics.setDislikesCount(postVotesRepository.countByValue(-1));
+        statistics.setViewsCount(postRepository.countAllViews());
+        statistics.setFirstPublication(postRepository.findPostByIsActiveOrderByTime(1).get(0).getTime().getTime() / 1000);
+        return statistics;
     }
 }

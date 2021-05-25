@@ -3,7 +3,7 @@ package com.gh4biz.devpub.model;
 import lombok.Data;
 
 @Data
-public class MyStatistics {
+public class Statistics {
     private int postsCount;
     private int likesCount;
     private int dislikesCount;
