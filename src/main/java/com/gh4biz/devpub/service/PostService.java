@@ -77,7 +77,9 @@ public class PostService {
 
         for (CommentCount comment : postCommentSlice) {
             Post post = postRepository.findPostsById(comment.getId());
-            postAnnotationResponseList.add(convert2Post4Response(post));
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
         }
 
         return new PostsResponse(postCommentSlice.getContent().size(),
@@ -92,15 +94,18 @@ public class PostService {
         );
         for (VoteCount vote : voteCounts) {
             Post post = postRepository.findPostsById(vote.getId());
-            postAnnotationResponseList.add(convert2Post4Response(post));
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
         }
         return new PostsResponse(voteCounts.getSize(), postAnnotationResponseList);
     }
 
     private PostsResponse recentPosts(int offset, int limit) {
         ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
-        Slice<Post> posts = postRepository.findAllByIsActiveOrderByTimeDesc(
+        Slice<Post> posts = postRepository.findAllByIsActiveAndStatusOrderByTimeDesc(
                 ACTIVE_POST_VALUE,
+                ModerationStatus.ACCEPTED,
                 PageRequest.of(offset / limit, limit)
         );
         for (Post post : posts) {
@@ -112,12 +117,15 @@ public class PostService {
 
     private PostsResponse earlyPosts(int offset, int limit) {
         ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
-        Slice<Post> posts = postRepository.findAllByIsActiveOrderByTimeAsc(
+        Slice<Post> posts = postRepository.findAllByIsActiveAndStatusOrderByTimeAsc(
                 ACTIVE_POST_VALUE,
+                ModerationStatus.ACCEPTED,
                 PageRequest.of(offset / limit, limit)
         );
         for (Post post : posts) {
-            postAnnotationResponseList.add(convert2Post4Response(post));
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
         }
         return new PostsResponse(postRepository.countAllByIsActive(ACTIVE_POST_VALUE), postAnnotationResponseList);
     }
@@ -174,7 +182,9 @@ public class PostService {
         ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
         for (Integer postId : posts) {
             Post post = postRepository.findPostsById(postId);
-            postAnnotationResponseList.add(convert2Post4Response(post));
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
         }
         return new PostsResponse(postAnnotationResponseList.size(), postAnnotationResponseList);
     }
@@ -189,7 +199,9 @@ public class PostService {
         ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
 
         for (Post post : postRepository.findAllById(posts)) {
-            postAnnotationResponseList.add(convert2Post4Response(post));
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
         }
 
         int count = tag2PostRepository.countPostsByTagName(tag2resp);
@@ -260,18 +272,25 @@ public class PostService {
 
     public ResponseEntity<PostsResponse> getModerationPosts(int offset, int limit, String status, Principal principal) {
         User moderator = userRepository.findByEmail(principal.getName()).get();
-        int count = postRepository.countByIsActiveAndStatusAndModerator(1, ModerationStatus.NEW, moderator);
-        Slice<Post> posts = postRepository.findAllByIsActiveAndStatusAndModerator(
-                1,
-                ModerationStatus.NEW,
-                moderator,
-                PageRequest.of(offset / limit, limit));
-
-        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
-        for (Post post : posts) {
-            postAnnotationResponseList.add(convert2Post4Response(post));
+        ModerationStatus moderationStatus = ModerationStatus.NEW;
+        if (status.equals("declined")){
+            moderationStatus = ModerationStatus.DECLINED;
+        }
+        if (status.equals("accepted")){
+            moderationStatus = ModerationStatus.ACCEPTED;
         }
 
+        int count = postRepository.countByIsActiveAndStatusAndModerator(1, moderationStatus, moderator);
+        Slice<Post> posts = postRepository.findAllByIsActiveAndStatus(
+                1,
+                moderationStatus,
+                PageRequest.of(offset / limit, limit));
+        ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
+        for (Post post : posts) {
+            if ((post.getIsActive() == 1) && (post.getStatus().equals(moderationStatus))) {
+                postAnnotationResponseList.add(convert2Post4Response(post));
+            }
+        }
         return ResponseEntity.ok(new PostsResponse(count, postAnnotationResponseList));
     }
 
