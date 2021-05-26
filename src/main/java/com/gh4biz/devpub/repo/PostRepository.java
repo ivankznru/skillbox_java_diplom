@@ -60,4 +60,6 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     Post findFirstByUserAndIsActiveOrderByTime(User user, int isActive);
 
     List<Post> findPostByIsActiveOrderByTime(int isActive);
+
+    int countAllByIsActiveAndStatus(int active_post_value, ModerationStatus status);
 }

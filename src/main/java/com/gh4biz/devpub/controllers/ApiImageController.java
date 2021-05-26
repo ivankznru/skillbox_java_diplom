@@ -81,9 +81,12 @@ public class ApiImageController {
 
         RandomString randomString = new RandomString(2);
         String newImgDir = "";
+        String newImgDirSite = "";
 
         for (int i = 0; i < 3; i++) {
-            newImgDir = newImgDir + File.separator + randomString.nextString();
+            String tmp = randomString.nextString();
+            newImgDir = newImgDir + File.separator + tmp;
+            newImgDirSite = newImgDirSite + "/" + tmp;
             if (!Files.exists(Paths.get(blogImageRealPathFolder + newImgDir))) {
                 Files.createDirectory(Paths.get(blogImageRealPathFolder + newImgDir));
             }
@@ -97,7 +100,7 @@ public class ApiImageController {
 
             Path path = Paths.get(blogImageRealPathFolder + newImgDir + File.separator + fileName);
             Files.write(path, bytes);
-            return blogImageDBPathFolder + newImgDir + File.separator + fileName;
+            return "/" + blogImageDBPathFolder + newImgDirSite + "/" + fileName;
         }
         return "неизвестная ошибка";
     }

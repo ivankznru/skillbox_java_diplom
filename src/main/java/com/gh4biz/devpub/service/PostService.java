@@ -74,6 +74,7 @@ public class PostService {
                 postCommentsRepository
                         .countTotalComments(
                                 PageRequest.of(offset / limit, limit));
+        System.out.println(postCommentSlice.getContent().size());
 
         for (CommentCount comment : postCommentSlice) {
             Post post = postRepository.findPostsById(comment.getId());
@@ -111,7 +112,7 @@ public class PostService {
         for (Post post : posts) {
             postAnnotationResponseList.add(convert2Post4Response(post));
         }
-        int count = postRepository.countAllByIsActive(ACTIVE_POST_VALUE);
+        int count = postRepository.countAllByIsActiveAndStatus(ACTIVE_POST_VALUE, ModerationStatus.ACCEPTED);
         return new PostsResponse(count, postAnnotationResponseList);
     }
 
@@ -127,7 +128,7 @@ public class PostService {
                 postAnnotationResponseList.add(convert2Post4Response(post));
             }
         }
-        return new PostsResponse(postRepository.countAllByIsActive(ACTIVE_POST_VALUE), postAnnotationResponseList);
+        return new PostsResponse(postRepository.countAllByIsActiveAndStatus(ACTIVE_POST_VALUE, ModerationStatus.ACCEPTED), postAnnotationResponseList);
     }
 
     private PostAnnotationResponse convert2Post4Response(Post post) {
@@ -325,8 +326,6 @@ public class PostService {
                 form.getText());
 
         String premoderationSettings = globalSettingsRepository.findByCode("POST_PREMODERATION").getValue();
-
-//        System.out.println(premoderationSettings);
 
         ModerationStatus status = premoderationSettings.equals("YES") ? ModerationStatus.NEW : ModerationStatus.ACCEPTED;
         post.setStatus(status);
