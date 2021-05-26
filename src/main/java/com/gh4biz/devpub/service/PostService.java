@@ -30,6 +30,7 @@ public class PostService {
     private final Tag2PostRepository tag2PostRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
+    private final GlobalSettingsRepository globalSettingsRepository;
 
     @Value("${blogAnnounceTextLimit}")
     private Integer blogAnnounceTextLimit;
@@ -292,7 +293,6 @@ public class PostService {
 
     public ResponseEntity<PostUpdateEditResponse> postAdd(PostEditForm form, Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
-
         if (!checkPost(form).isEmpty()) {
             return ResponseEntity.ok(new PostUpdateEditResponse(false, checkPost(form)));
         }
@@ -304,6 +304,14 @@ public class PostService {
                 new Date(form.getTimestamp() * 1000),
                 form.getTitle(),
                 form.getText());
+
+        String premoderationSettings = globalSettingsRepository.findByCode("POST_PREMODERATION").getValue();
+
+//        System.out.println(premoderationSettings);
+
+        ModerationStatus status = premoderationSettings.equals("YES") ? ModerationStatus.NEW : ModerationStatus.ACCEPTED;
+        post.setStatus(status);
+
         postRepository.save(post);
         for (String tagName : form.getTags()) {
             Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
