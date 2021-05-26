@@ -195,8 +195,23 @@ public class PostService {
         return new PostsResponse(count, postAnnotationResponseList);
     }
 
-    public PostResponse getPostById(int postId) {
+    public PostResponse getPostById(int postId, Principal principal) {
         Post post = postRepository.findPostsById(postId);
+        Optional<User> optionalUser = Optional.empty();
+
+        if (principal != null) optionalUser = userRepository.findByEmail(principal.getName());
+        // увеличиваем просмотры если юзер не авторизован
+        if (optionalUser.isEmpty()) {
+            post.setViewCount(post.getViewCount() + 1);
+            postRepository.save(post);
+        }
+        // увеличиваем просмотры если юзер не модератор и не автор поста
+        if (optionalUser.isPresent()
+                && (optionalUser.get().getIsModerator() != 1)
+                && (!optionalUser.get().getId().equals(post.getUser().getId()))) {
+            post.setViewCount(post.getViewCount() + 1);
+            postRepository.save(post);
+        }
         PostResponse postResponse = new PostResponse();
 
         postResponse.setId(post.getId());
@@ -208,8 +223,6 @@ public class PostService {
                 post.getUser().getId(),
                 post.getUser().getName()));
         postResponse.setTitle(post.getTitle());
-
-        //System.out.println(post.getText());
 
         postResponse.setText(post.getText());
         postResponse.setLikeCount(getVoteCount(post, 1));
@@ -223,7 +236,6 @@ public class PostService {
             tags.add(tag.getName());
         }
         postResponse.setTags(tags);
-        //  postResponse.setPost(post);
 
         return postResponse;
     }
@@ -232,7 +244,6 @@ public class PostService {
         ArrayList<CommentResponse> commentResponseArrayList = new ArrayList<>();
         ArrayList<PostComment> commentsIdList = getPostCommentsByPostId(postId);
         for (PostComment postComment : commentsIdList) {
-            //PostComment postComment = PostService.getPostCommentsRepository().findPostCommentById(commentId);
             commentResponseArrayList.add(
                     new CommentResponse(
                             postComment.getId(),

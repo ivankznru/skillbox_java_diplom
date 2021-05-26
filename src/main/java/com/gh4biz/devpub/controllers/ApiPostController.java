@@ -63,8 +63,9 @@ public class ApiPostController {
 
     @GetMapping("/post/{id}")
     public ResponseEntity<PostResponse> getPost(
-            @PathVariable int id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+            @PathVariable int id,
+            Principal principal) {
+        return ResponseEntity.ok(postService.getPostById(id, principal));
     }
 
     @GetMapping("/post/moderation")
