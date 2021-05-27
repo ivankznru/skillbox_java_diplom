@@ -31,7 +31,7 @@ blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
 
 blogUrl: http://127.0.0.1:8080
-blogImageDBPathFolder: resources/static/img
+blogImageDBPathFolder: resources\static\img
 blogImageRealPathFolder: src\main\resources\static\img
 
 blogAvatarHeight: 100

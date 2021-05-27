@@ -45,10 +45,10 @@ public class ApiImageController {
             @PathVariable String filename) throws MalformedURLException {
 
         return ResponseEntity.ok(loadAsResource(
-                blogImageRealPathFolder.concat("\\").
-                        concat(f1).concat("\\").
-                        concat(f2).concat("\\").
-                        concat(f3).concat("\\").
+                blogImageRealPathFolder.concat(File.separator).
+                        concat(f1).concat(File.separator).
+                        concat(f2).concat(File.separator).
+                        concat(f3).concat(File.separator).
                         concat(filename)));
     }
 
@@ -86,7 +86,7 @@ public class ApiImageController {
         for (int i = 0; i < 3; i++) {
             String tmp = randomString.nextString();
             newImgDir = newImgDir + File.separator + tmp;
-            newImgDirSite = newImgDirSite + "/" + tmp;
+            newImgDirSite = newImgDirSite + File.separator + tmp;
             if (!Files.exists(Paths.get(blogImageRealPathFolder + newImgDir))) {
                 Files.createDirectory(Paths.get(blogImageRealPathFolder + newImgDir));
             }
@@ -100,7 +100,7 @@ public class ApiImageController {
 
             Path path = Paths.get(blogImageRealPathFolder + newImgDir + File.separator + fileName);
             Files.write(path, bytes);
-            return "/" + blogImageDBPathFolder + newImgDirSite + "/" + fileName;
+            return File.separator + blogImageDBPathFolder + newImgDirSite + File.separator + fileName;
         }
         return "неизвестная ошибка";
     }
