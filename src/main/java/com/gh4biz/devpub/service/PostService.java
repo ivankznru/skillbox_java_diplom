@@ -376,9 +376,9 @@ public class PostService {
 
         HashMap<String, String> errors = new HashMap<>();
 
-        if ((currentTimestamp - formTimestamp) > 600) {
-            errors.put("timestamp", "Проверьте дату публикации");
-        }
+//        if ((currentTimestamp - formTimestamp) > 600) {
+//            errors.put("timestamp", "Проверьте дату публикации");
+//        }
         if ((form.getTitle().isEmpty()) || (form.getTitle().length() < 3)) {
             errors.put("title", "Текст заголовка менее трёх символов!");
         }
