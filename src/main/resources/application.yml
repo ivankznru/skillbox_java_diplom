@@ -17,7 +17,7 @@ server.port: ${PORT:8080}
 server.tomcat.max-swallow-size: -1
 server.error.include-message: always
 
-blogTitle: DevPub
+blogTitle: GhDevPub
 blogSubtitle: Рассказы разработчиков
 blogPhone: +7 (812) 244-54-32
 blogEmail: vkotov@vfemail.net
