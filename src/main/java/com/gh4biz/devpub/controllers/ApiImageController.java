@@ -50,7 +50,7 @@ public class ApiImageController {
 
 
         HttpHeaders headers = new HttpHeaders();
-        String dir = blogImageRealPathFolder + 
+        String dir = blogImageRealPathFolder +
                 f1 + File.separator +
                 f2 + File.separator +
                 f3 + File.separator;
