@@ -349,7 +349,7 @@ public class PostService {
 
         Post post = postRepository.findPostsById(id);
         post.setIsActive(form.getActive());
-        
+
         if (user.getIsModerator() == 0) {
             post.setStatus(ModerationStatus.NEW);
         }
