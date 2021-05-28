@@ -5,8 +5,8 @@ server:
   servlet:
     encoding:
       charset: UTF-8
-      enabled: true
-      force: true
+#      enabled: true
+#      force: true
 
 spring.datasource.username: skilluser
 spring.datasource.password: testTEST667+667
