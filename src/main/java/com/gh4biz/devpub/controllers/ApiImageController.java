@@ -36,7 +36,7 @@ public class ApiImageController {
         return saveUploadedFile(image);
     }
 
-    @GetMapping("/img/{f1}/{f2}/{f3}/{filename:.+}")
+    @GetMapping("/resources/static/img/{f1}/{f2}/{f3}/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getImage(
             @PathVariable String f1,
@@ -52,7 +52,7 @@ public class ApiImageController {
                         concat(filename)));
     }
 
-    @GetMapping("/img/{filename:.+}")
+    @GetMapping("/resources/static/img/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> getAvatar(
             @PathVariable String filename) throws MalformedURLException {
