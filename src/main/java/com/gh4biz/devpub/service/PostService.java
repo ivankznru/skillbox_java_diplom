@@ -353,7 +353,7 @@ public class PostService {
             post.setStatus(ModerationStatus.NEW);
         }
 
-        post.setTime(new Date(form.getTimestamp() * 1000));
+        post.setTime(new Date());
         post.setTitle(form.getTitle());
         post.setText(form.getText());
         postRepository.save(post);
