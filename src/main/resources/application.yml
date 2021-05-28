@@ -31,8 +31,8 @@ blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
 
 blogUrl: https://devpub-gh4biz.herokuapp.com
-blogImageDBPathFolder: resources/static/img
-blogImageRealPathFolder: src/main/resources/static/img
+blogImageDBPathFolder: resources/static/img/
+blogImageRealPathFolder: src\main\resources\static\img\
 
 blogAvatarHeight: 100
 blogAvatarWidth: 100
