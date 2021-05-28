@@ -187,8 +187,8 @@ public class RegisterService {
         }
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String fileName = generateKey(file.getOriginalFilename()) + "." + extension;
-        String path = blogImageRealPathFolder + File.separator + fileName;
-        String dbPath = blogImageDBPathFolder + File.separator + fileName;
+        String path = blogImageRealPathFolder + fileName;
+        String dbPath = blogImageDBPathFolder + fileName;
 
         File outputFile = new File(path);
         ImageIO.write(bufferedImage, extension, outputFile);

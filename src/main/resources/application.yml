@@ -30,7 +30,7 @@ blogAnnounceTextLimit: 150
 blogCommentTextLength: 5
 blogUploadImageSizeLimit: 3145728
 
-blogUrl: http://127.0.0.1:8080
+blogUrl: https://devpub-gh4biz.herokuapp.com
 blogImageDBPathFolder: resources/static/img
 blogImageRealPathFolder: src/main/resources/static/img
 

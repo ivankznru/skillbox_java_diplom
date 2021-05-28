@@ -2,9 +2,11 @@ package com.gh4biz.devpub.controllers;
 
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
+import javax.servlet.ServletContext;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,44 +31,45 @@ public class ApiImageController {
     @Value("${blogImageDBPathFolder}")
     private String blogImageDBPathFolder;
 
+    @Autowired
+    ServletContext servletContext;
+
     @RequestMapping(value = "/api/image", method = RequestMethod.POST)
     @PreAuthorize("hasAuthority('user:write')")
     public String uploadFile(MultipartFile image) throws IOException {
         return saveUploadedFile(image);
     }
 
-    @GetMapping("/img/{f1}/{f2}/{f3}/{filename:.+}")
+    @GetMapping("/resources/static/img/{f1}/{f2}/{f3}/{filename:.+}")
     @ResponseBody
-    public ResponseEntity<Resource> getImage(
+    public ResponseEntity<byte[]> getImage(
             @PathVariable String f1,
             @PathVariable String f2,
             @PathVariable String f3,
-            @PathVariable String filename) throws MalformedURLException {
+            @PathVariable String filename) throws IOException {
 
-        return ResponseEntity.ok(loadAsResource(
-                blogImageRealPathFolder.concat(File.separator).
-                        concat(f1).concat(File.separator).
-                        concat(f2).concat(File.separator).
-                        concat(f3).concat(File.separator).
-                        concat(filename)));
+
+        HttpHeaders headers = new HttpHeaders();
+        String dir = blogImageRealPathFolder + File.separator +
+                f1 + File.separator +
+                f2 + File.separator +
+                f3 + File.separator;
+
+        InputStream in = new FileInputStream(dir + filename);
+        byte[] media = IOUtils.toByteArray(in);
+        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+        return responseEntity;
     }
 
-    @GetMapping("/img/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Resource> getAvatar(
-            @PathVariable String filename) throws MalformedURLException {
-        return ResponseEntity.ok(loadAsResource(blogImageRealPathFolder + File.separator + filename));
-    }
-
-    public Resource loadAsResource(String filename) throws MalformedURLException {
-        Path p = Paths.get(filename);
-        Resource resource = new UrlResource(p.toUri());
-        if (resource.exists() || resource.isReadable()) {
-            return resource;
-        } else {
-            System.out.println("no file");
-        }
-        return null;
+    @RequestMapping(value = "/resources/static/img/{filename:.+}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> getImageAsResponseEntity(@PathVariable String filename) throws IOException {
+        HttpHeaders headers = new HttpHeaders();
+        InputStream in = new FileInputStream(blogImageRealPathFolder + filename);
+        byte[] media = IOUtils.toByteArray(in);
+        headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+        return responseEntity;
     }
 
     private String saveUploadedFile(MultipartFile file) throws IOException {
@@ -80,15 +82,16 @@ public class ApiImageController {
         }
 
         RandomString randomString = new RandomString(2);
-        String newImgDir = "";
-        String newImgDirSite = "";
+        String newBackImgDir = "";
+        String newFrontImgDir = "";
 
         for (int i = 0; i < 3; i++) {
             String tmp = randomString.nextString();
-            newImgDir = newImgDir + File.separator + tmp;
-            newImgDirSite = newImgDirSite + File.separator + tmp;
-            if (!Files.exists(Paths.get(blogImageRealPathFolder + newImgDir))) {
-                Files.createDirectory(Paths.get(blogImageRealPathFolder + newImgDir));
+            newBackImgDir = newBackImgDir + tmp + File.separator;
+            newFrontImgDir = newFrontImgDir + tmp + File.separator;
+
+            if (!Files.exists(Paths.get(blogImageRealPathFolder + newBackImgDir))) {
+                Files.createDirectory(Paths.get(blogImageRealPathFolder + newBackImgDir));
             }
         }
 
@@ -98,9 +101,9 @@ public class ApiImageController {
             byte[] bytes = file.getBytes();
             String fileName = generateKey(file.getOriginalFilename()) + "." + extension;
 
-            Path path = Paths.get(blogImageRealPathFolder + newImgDir + File.separator + fileName);
+            Path path = Paths.get(blogImageRealPathFolder + newBackImgDir + fileName);
             Files.write(path, bytes);
-            return File.separator + blogImageDBPathFolder + newImgDirSite + File.separator + fileName;
+            return File.separator + blogImageDBPathFolder + newFrontImgDir + fileName;
         }
         return "неизвестная ошибка";
     }
