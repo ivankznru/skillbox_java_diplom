@@ -1,1 +1,1 @@
-web: java -jar target/blog-engine-1.0.jar
+web: java -jar target/devpub-0.0.1-SNAPSHOT.jar
