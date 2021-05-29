@@ -74,7 +74,7 @@ public class PostService {
                 postCommentsRepository
                         .countTotalComments(
                                 PageRequest.of(offset / limit, limit));
-        System.out.println(postCommentSlice.getContent().size());
+        //System.out.println(postCommentSlice.getContent().size());
 
         for (CommentCount comment : postCommentSlice) {
             Post post = postRepository.findPostsById(comment.getId());
@@ -82,7 +82,6 @@ public class PostService {
                 postAnnotationResponseList.add(convert2Post4Response(post));
             }
         }
-
         return new PostsResponse(postCommentSlice.getContent().size(),
                 postAnnotationResponseList);
     }

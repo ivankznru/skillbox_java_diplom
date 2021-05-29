@@ -1,5 +1,6 @@
 package com.gh4biz.devpub.service;
 
+import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.TagWeight;
 import com.gh4biz.devpub.model.entity.Tag;
 import com.gh4biz.devpub.model.entity.Tag2Post;
@@ -29,7 +30,7 @@ public class TagService {
 
     public TagResponse getTags() {
         TagResponse tagResponse = new TagResponse();
-        int postsCount = postRepository.countAllByIsActive(1);
+        int postsCount = postRepository.countAllByIsActiveAndStatus(1, ModerationStatus.ACCEPTED);
         ArrayList<TagWeight> tagWeights = new ArrayList<>();
         ArrayList<Integer> orderedTagsIdByTagsCount = tag2PostRepository.getOrderedTags();
         int idMax = orderedTagsIdByTagsCount.get(0);
