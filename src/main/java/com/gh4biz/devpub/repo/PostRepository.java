@@ -31,7 +31,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
             Date publicationTimeStart,
             Date publicationTimeEnd);
 
-    @Query("SELECT DISTINCT year(time) FROM Post AS year GROUP BY year")
+    @Query("SELECT DISTINCT year(time) FROM Post AS year WHERE isActive = 1 and status = 'ACCEPTED' GROUP BY year")
     ArrayList<Integer> getYears();
 
     @Query("SELECT id FROM Post WHERE isActive = 1 and year(time) = ?1 and month(time) = ?2 and day(time) = ?3 order by time desc")
