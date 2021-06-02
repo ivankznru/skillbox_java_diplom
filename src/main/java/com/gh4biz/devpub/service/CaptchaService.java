@@ -46,7 +46,7 @@ public class CaptchaService {
 
     public CaptchaResponse generateCaptcha() throws IOException {
         deleteOldCaptchas();
-        Captcha captcha = new Captcha.Builder(130, 50)
+        Captcha captcha = new Captcha.Builder(100, 35)
                 .addText()
                 .build();
         RandomString randomString = new RandomString(5);
