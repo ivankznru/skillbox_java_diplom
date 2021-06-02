@@ -5,7 +5,6 @@ import com.gh4biz.devpub.model.entity.CaptchaCode;
 import com.gh4biz.devpub.model.response.CaptchaResponse;
 import com.gh4biz.devpub.repo.CaptchaRepository;
 import net.bytebuddy.utility.RandomString;
-//import nl.captcha.Captcha;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
