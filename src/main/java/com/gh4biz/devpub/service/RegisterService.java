@@ -92,10 +92,11 @@ public class RegisterService {
             regErrors.setName("Имя указано неверно");
             return ResponseEntity.ok(new RegisterResult(false, regErrors));
         }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
         User user = new User(
                 form.getName(),
                 form.getEmail(),
-                form.getPassword()
+                encoder.encode(form.getPassword())
         );
         userRepository.save(user);
 
