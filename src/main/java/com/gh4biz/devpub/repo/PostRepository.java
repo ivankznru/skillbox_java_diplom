@@ -26,8 +26,9 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     Slice<Post> findAllByIsActiveAndStatusOrderByTimeAsc(int isActive, ModerationStatus status, Pageable pageable);
     Slice<Post> findAllByIsActiveAndStatus(int isActive, ModerationStatus status, Pageable pageable);
 
-    int countAllByIsActiveAndTimeBetween(
+    int countAllByIsActiveAndStatusAndTimeBetween(
             int isActive,
+            ModerationStatus status,
             Date publicationTimeStart,
             Date publicationTimeEnd);
 

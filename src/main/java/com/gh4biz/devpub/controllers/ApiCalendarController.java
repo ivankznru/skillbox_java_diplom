@@ -1,5 +1,6 @@
 package com.gh4biz.devpub.controllers;
 
+import com.gh4biz.devpub.model.ModerationStatus;
 import com.gh4biz.devpub.model.response.PostsByYearResponse;
 import com.gh4biz.devpub.repo.PostRepository;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class ApiCalendarController {
 
             postsCountPerDay.put(
                     sdf4response.format(dateStart),
-                    postRepository.countAllByIsActiveAndTimeBetween(1, dateStart, dateEnd));
+                    postRepository.countAllByIsActiveAndStatusAndTimeBetween(1, ModerationStatus.ACCEPTED, dateStart, dateEnd));
         }
         postsByYearResponse.setPosts(postsCountPerDay);
         return ResponseEntity.ok(postsByYearResponse);
