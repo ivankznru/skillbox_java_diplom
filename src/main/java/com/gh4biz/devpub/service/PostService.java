@@ -74,7 +74,6 @@ public class PostService {
                 postCommentsRepository
                         .countTotalComments(
                                 PageRequest.of(offset / limit, limit));
-        //System.out.println(postCommentSlice.getContent().size());
 
         for (CommentCount comment : postCommentSlice) {
             Post post = postRepository.findPostsById(comment.getId());
@@ -88,10 +87,8 @@ public class PostService {
 
     private PostsResponse bestPosts(int offset, int limit) {
         ArrayList<PostAnnotationResponse> postAnnotationResponseList = new ArrayList<>();
-        Slice<VoteCount> voteCounts = postVotesRepository.countTotalVote(
-                LIKE_VALUE,
-                PageRequest.of(offset / limit, limit)
-        );
+        Slice<VoteCount> voteCounts = postVotesRepository.postsOrderByVoteSum(
+                PageRequest.of(offset / limit, limit));
         for (VoteCount vote : voteCounts) {
             Post post = postRepository.findPostsById(vote.getId());
             if ((post.getIsActive() == 1) && (post.getStatus().equals(ModerationStatus.ACCEPTED))) {

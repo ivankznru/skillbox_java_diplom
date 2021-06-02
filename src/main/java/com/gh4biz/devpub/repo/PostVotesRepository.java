@@ -15,8 +15,13 @@ public interface PostVotesRepository extends CrudRepository<PostVote, Integer> {
     int countAllByPostIdAndValue(int id, int value);
 
     @Query("SELECT new com.gh4biz.devpub.model.response.VoteCount(p.post.id, COUNT(p.post.id)) "
-            + "FROM PostVote AS p WHERE p.post.isActive = 1 and value = ?1 GROUP BY p.post.id ORDER BY COUNT(p.post.id) DESC")
-    Slice<VoteCount> countTotalVote(int value, Pageable pageable);
+            + "FROM PostVote AS p WHERE p.post.isActive = 1 and p.post.status = 'ACCEPTED' GROUP BY p.post.id ORDER BY COUNT(p.post.id) DESC")
+    Slice<VoteCount> countTotalVote(Pageable pageable);
+
+
+    @Query("SELECT new com.gh4biz.devpub.model.response.VoteCount(pv.post.id, SUM(pv.value)) "
+            + "FROM PostVote AS pv WHERE pv.post.isActive = 1 and pv.post.status = 'ACCEPTED' GROUP BY pv.post.id ORDER BY SUM(pv.value) DESC")
+    Slice<VoteCount> postsOrderByVoteSum (Pageable pageable);
 
     int countByUserAndValue(User user, int value);
 
