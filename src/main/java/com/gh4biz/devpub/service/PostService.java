@@ -236,7 +236,7 @@ public class PostService {
 
         postResponse.setText(post.getText());
         postResponse.setLikeCount(getVoteCount(post, 1));
-        postResponse.setLikeCount(getVoteCount(post, -1));
+        postResponse.setDislikeCount(getVoteCount(post, -1));
         postResponse.setViewCount(post.getViewCount());
         postResponse.setComments(getComments(postId));
 
