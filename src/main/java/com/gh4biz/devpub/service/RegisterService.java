@@ -115,9 +115,9 @@ public class RegisterService {
                                    Principal principal) {
         User user = userRepository.findByEmail(principal.getName()).get();
         if (form.getRemovePhoto() == 1) {
-            String path = "src\\main" + user.getPhoto();
+            String path = "src" + File.separator + "main" + user.getPhoto();
             File file = new File(path);
-            System.out.println(path);
+            //System.out.println(path);
             if (file.delete()) {
                 user.setPhoto("");
                 userRepository.save(user);
@@ -125,21 +125,12 @@ public class RegisterService {
         }
 
         HashMap<String, String> errors = new HashMap<>();
-        boolean emailChanged = !principal.getName().equals(form.getEmail());
+        boolean changeEmail = !principal.getName().equals(form.getEmail());
 
-        if (emailChanged &
+        if (changeEmail &
                 userRepository.findByEmail(form.getEmail()).isPresent()) {
             errors.put("email", "Этот e-mail уже зарегистрирован!");
             return new ProfileEdit(false, errors);
-        }
-
-        if (!form.getEmail().equals(principal.getName())) {
-            user.setEmail(form.getEmail());
-
-            userRepository.save(user);
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(form.getEmail(), user.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
         if (form.getName().length() < 3) {
@@ -147,10 +138,18 @@ public class RegisterService {
             return new ProfileEdit(false, errors);
         }
 
+        if (!form.getEmail().equals(principal.getName())) {
+            user.setEmail(form.getEmail());
+            userRepository.save(user);
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(form.getEmail(), user.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
         user.setName(form.getName());
 
-        if (form.getPassword() != null)
-            user.setName(form.getName());
+//        if (form.getPassword() != null)
+//            user.setName(form.getName());
 
         if (form.getPassword() != null)
             user.setPassword(
@@ -245,13 +244,13 @@ public class RegisterService {
     }
 
     public RegisterResult changePassword(ChangePasswordForm changePasswordForm) {
-        if (!checkCaptcha(changePasswordForm.getCaptchaSecret())){
+        if (!checkCaptcha(changePasswordForm.getCaptchaSecret())) {
             RegErrors regErrors = new RegErrors();
             regErrors.setCaptcha("Неверный код");
             return new RegisterResult(false, regErrors);
         }
         Optional<User> optionalUser = userRepository.findUserByCode(changePasswordForm.getCode());
-        if (optionalUser.isEmpty()){
+        if (optionalUser.isEmpty()) {
             return new RegisterResult(false);
         }
         User user = optionalUser.get();

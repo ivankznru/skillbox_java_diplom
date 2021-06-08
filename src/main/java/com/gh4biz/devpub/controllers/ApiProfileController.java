@@ -27,7 +27,6 @@ public class ApiProfileController {
     public ResponseEntity<ProfileEdit> editProfile(
             @RequestBody ProfileEditForm form,
             Principal principal) {
-//        return ResponseEntity.ok(new ProfileEdit(false));
         return ResponseEntity.ok(registerService.editProfile(form, principal));
     }
 
