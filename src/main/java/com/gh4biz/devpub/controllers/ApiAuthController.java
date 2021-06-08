@@ -34,7 +34,7 @@ public class ApiAuthController {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final  PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
 
     @Autowired
@@ -64,17 +64,14 @@ public class ApiAuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-
-        if (userRepository.findByEmail(loginRequest.getEmail()).isEmpty()){
+        if (userRepository.findByEmail(loginRequest.getEmail()).isEmpty()) {
             return ResponseEntity.ok(new LoginResponse(false));
         }
 
         com.gh4biz.devpub.model.entity.User tryLoginUser = userRepository.findByEmail(loginRequest.getEmail()).get();
-
-        if(!passwordEncoder.matches(loginRequest.getPassword(), tryLoginUser.getPassword())) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), tryLoginUser.getPassword())) {
             return ResponseEntity.ok(new LoginResponse(false));
         }
-        
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(auth);
@@ -117,12 +114,13 @@ public class ApiAuthController {
         userResponse.setId(currentUser.getId());
         userResponse.setName(currentUser.getName());
         userResponse.setPhoto(currentUser.getPhoto());
-        if (currentUser.getIsModerator() == 1)
-        userResponse.setModerationCount(postRepository.countByIsActiveAndStatusAndModerator(
-                1,
-                ModerationStatus.NEW,
-                currentUser
-        ));
+        if (currentUser.getIsModerator() == 1) {
+            userResponse.setModerationCount(postRepository.countByIsActiveAndStatusAndModerator(
+                    1,
+                    ModerationStatus.NEW,
+                    currentUser));
+            userResponse.setSettings(true);
+        }
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setResult(true);
         loginResponse.setUserLoginResponse(userResponse);
