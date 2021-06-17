@@ -4,7 +4,9 @@ import com.gh4biz.devpub.model.ModerationStatus;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity

@@ -254,15 +254,27 @@ public class PostService {
         ArrayList<CommentResponse> commentResponseArrayList = new ArrayList<>();
         ArrayList<PostComment> commentsIdList = getPostCommentsByPostId(postId);
         for (PostComment postComment : commentsIdList) {
-            commentResponseArrayList.add(
-                    new CommentResponse(
-                            postComment.getId(),
-                            postComment.getTime().getTime() / 1000,
-                            postComment.getText(),
-                            new UserWithPhotoResponse(
-                                    postComment.getUser().getId(),
-                                    postComment.getUser().getName(),
-                                    postComment.getUser().getPhoto())));
+            if (postComment.getParent() != null) {
+                commentResponseArrayList.add(
+                        new CommentResponse(
+                                postComment.getId(),
+                                postComment.getTime().getTime() / 1000,
+                                postComment.getParent().getId(),
+                                postComment.getText(),
+                                new UserWithPhotoResponse(
+                                        postComment.getUser().getId(),
+                                        postComment.getUser().getName(),
+                                        postComment.getUser().getPhoto())));
+            } else
+                commentResponseArrayList.add(
+                        new CommentResponse(
+                                postComment.getId(),
+                                postComment.getTime().getTime() / 1000,
+                                postComment.getText(),
+                                new UserWithPhotoResponse(
+                                        postComment.getUser().getId(),
+                                        postComment.getUser().getName(),
+                                        postComment.getUser().getPhoto())));
         }
         return commentResponseArrayList;
     }
@@ -270,10 +282,10 @@ public class PostService {
     public ResponseEntity<PostsResponse> getModerationPosts(int offset, int limit, String status, Principal principal) {
         User moderator = userRepository.findByEmail(principal.getName()).get();
         ModerationStatus moderationStatus = ModerationStatus.NEW;
-        if (status.equals("declined")){
+        if (status.equals("declined")) {
             moderationStatus = ModerationStatus.DECLINED;
         }
-        if (status.equals("accepted")){
+        if (status.equals("accepted")) {
             moderationStatus = ModerationStatus.ACCEPTED;
         }
 
@@ -355,15 +367,42 @@ public class PostService {
         post.setText(form.getText());
         postRepository.save(post);
 
-        for (String tagName : form.getTags()) {
-            Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
-            Tag2Post tag2Post = optionalTag.isPresent() ?
-                    new Tag2Post(post, optionalTag.get()) :
-                    new Tag2Post(post, new Tag(tagName));
-            tag2PostRepository.save(tag2Post);
-        }
+        ArrayList<Tag2Post> tag2posts = tag2PostRepository.findAllByPostId(post.getId());
 
+        if (tag2posts.isEmpty()) {
+            for (String tagName : form.getTags()) {
+                Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
+                Tag tag;
+                if (optionalTag.isEmpty()) {
+                    tag = new Tag(tagName);
+                    tagRepository.save(tag);
+                } else {
+                    tag = optionalTag.get();
+                }
+                tag2PostRepository.save(new Tag2Post(post, tag));
+            }
+        } else {
+            for (Tag2Post item : tag2posts) {
+                String tagName = item.getTag().getName();
+                if (!form.getTags().contains(tagName)){
+                    tag2PostRepository.delete(item);
+                }
+            }
+            for (String item : form.getTags()){
+                Optional<Tag> optionalTag = tagRepository.findTagByName(item);
+                Tag tag = optionalTag.orElseGet(() -> new Tag(item));
+                addTag2Post(post, tag);
+            }
+        }
         return ResponseEntity.ok(new PostUpdateEditResponse(true));
+    }
+
+    private void addTag2Post(Post post, Tag tag) {
+        Optional<Tag2Post> tag2Post = tag2PostRepository.findTag2PostsByPostAndTag(post, tag);
+        if (tag2Post.isEmpty()){
+            Tag2Post t2p = new Tag2Post(post, tag);
+            tag2PostRepository.save(t2p);
+        }
     }
 
     private HashMap<String, String> checkPost(PostEditForm form) {

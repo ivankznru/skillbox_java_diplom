@@ -17,11 +17,12 @@ CREATE TABLE `posts`
     `is_active`    tinyint         NOT NULL,
     `status`       ENUM ('NEW', 'ACCEPTED', 'DECLINED'),
     `moderator_id` int,
-    `user_id`      int,
+    `user_id`      int             NOT NULL,
     `time`         datetime        NOT NULL,
     `title`        varchar(255)    NOT NULL,
     `text`         text            NOT NULL,
-    `view_count`   int             NOT NULL
+    `view_count`   int             NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on DELETE cascade
 );
 
 CREATE TABLE `post_votes`
@@ -30,7 +31,9 @@ CREATE TABLE `post_votes`
     `user_id` int             NOT NULL,
     `post_id` int             NOT NULL,
     `time`    datetime        NOT NULL,
-    `value`   tinyint         NOT NULL
+    `value`   tinyint         NOT NULL,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on delete cascade,
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade
 );
 
 CREATE TABLE `tags`
@@ -42,8 +45,10 @@ CREATE TABLE `tags`
 CREATE TABLE `tag2post`
 (
     `id`      int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `post_id` int             NOT NULL,
-    `tag_id`  int             NOT NULL
+    `post_id` int,
+    `tag_id`  int,
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade,
+    FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) on DELETE cascade
 );
 
 CREATE TABLE `post_comments`
@@ -53,7 +58,11 @@ CREATE TABLE `post_comments`
     `post_id`   int             NOT NULL,
     `user_id`   int             NOT NULL,
     `time`      datetime        NOT NULL,
-    `text`      text            NOT NULL
+    `text`      text            NOT NULL,
+    FOREIGN KEY (`parent_id`) REFERENCES `post_comments` (`id`) on delete cascade,
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on delete cascade
+
 );
 
 CREATE TABLE `captcha_codes`
@@ -72,26 +81,26 @@ CREATE TABLE `global_settings`
     `value` varchar(255)    NOT NULL
 );
 
-ALTER TABLE `posts`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+# ALTER TABLE `posts`
+#     ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
-ALTER TABLE `post_votes`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+# ALTER TABLE `post_votes`
+#     ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
-ALTER TABLE `post_votes`
-    ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
+# ALTER TABLE `post_votes`
+#     ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
 
-ALTER TABLE `tag2post`
-    ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
+# ALTER TABLE `tag2post`
+#     ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
+#
+# ALTER TABLE `tag2post`
+#     ADD FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`);
 
-ALTER TABLE `tag2post`
-    ADD FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`);
-
-ALTER TABLE `post_comments`
-    ADD FOREIGN KEY (`parent_id`) REFERENCES `post_comments` (`id`);
-
-ALTER TABLE `post_comments`
-    ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
-
-ALTER TABLE `post_comments`
-    ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+# ALTER TABLE `post_comments`
+#     ADD FOREIGN KEY (`parent_id`) REFERENCES `post_comments` (`id`);
+#
+# ALTER TABLE `post_comments`
+#     ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
+#
+# ALTER TABLE `post_comments`
+#     ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
