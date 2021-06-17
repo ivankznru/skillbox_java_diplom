@@ -1,15 +1,23 @@
-spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.MySQL55Dialect
-spring.datasource.url: jdbc:mysql://portal.baltalm.ru:3306/devpub?characterEncoding=utf8&useSSL=false&serverTimezone=Europe/Moscow
-#spring.datasource.url: jdbc:${CLEARDB_DATABASE_URL:mysql://192.168.20.19:3306/devpub?characterEncoding=utf-8}
+spring:
+ jpa:
+  properties:
+   hibernate:
+    dialect: org.hibernate.dialect.MySQL55Dialect
+    ddl-auto: validate
+   show-sql: false
+ datasource:
+#  url: jdbc:mysql://portal.baltalm.ru:3306/devpub?characterEncoding=utf8&useSSL=false&serverTimezone=Europe/Moscow
+  url: jdbc:${CLEARDB_DATABASE_URL:mysql://192.168.20.19:3306/devpub?characterEncoding=utf-8}
 
-spring.datasource.username: skilluser
-spring.datasource.password: testTEST667+667
-spring.jpa.hibernate.ddl-auto: validate
-spring.jpa.show-sql: false
-server.port: ${PORT:8080}
+  username: skilluser
+  password: testTEST667+667
 
-server.tomcat.max-swallow-size: -1
-server.error.include-message: always
+server:
+ port: ${PORT:8080}
+ tomcat:
+  max-swallow-size: -1
+ error:
+  include-message: always
 
 blogTitle: GhDevPub
 blogSubtitle: Рассказы разработчиков
