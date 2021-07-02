@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.Optional;
 
 public interface TagRepository extends CrudRepository<Tag, Integer> {
-    Optional<Tag> findTagByName(String name);
+    Optional<Tag> getAllByName(String name);
 }

@@ -21,6 +21,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
     Page<Post> findAll (Pageable pageable);
 
     Post findPostsById(int id);
+    Optional<Post> findPostById(int id);
 
     Slice<Post> findAllByIsActiveAndStatusOrderByTimeDesc(int isActive, ModerationStatus status, Pageable pageable);
     Slice<Post> findAllByIsActiveAndStatusOrderByTimeAsc(int isActive, ModerationStatus status, Pageable pageable);

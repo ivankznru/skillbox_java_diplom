@@ -3,6 +3,7 @@ package com.gh4biz.devpub.model.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,4 +20,7 @@ public class Tag {
 
     public Tag() {
     }
+
+    @OneToMany(targetEntity=Tag2Post.class, mappedBy="tag",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Tag2Post> tag2PostList;
 }

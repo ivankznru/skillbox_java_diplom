@@ -4,9 +4,7 @@ import com.gh4biz.devpub.model.ModerationStatus;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Entity
@@ -16,17 +14,19 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id поста
 
-    @Column(name = "is_active", columnDefinition = "TINYINT")
+    @Column(name = "is_active")
     private int isActive; //скрыта или активна публикация: 0 или 1
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "enum")
     private ModerationStatus status; //статус модерации, по умолчанию значение "NEW"
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+//    @JoinColumn(name = "moderator_id")
     private User moderator; //ID пользователя-модератора, принявшего решение
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
     private User user; //автор поста
 
     private Date time; //дата и время публикации поста
@@ -50,4 +50,7 @@ public class Post {
         this.text = text;
         viewCount = 0;
     }
+
+//    @OneToMany(targetEntity=Tag2Post.class, mappedBy="post",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<Tag2Post> tag2PostList;
 }

@@ -89,9 +89,9 @@ public class ApiAuthController {
     }
 
     @GetMapping("/auth/logout")
-    public String logout() {
+    public ResponseEntity<Result> logout() {
         SecurityContextHolder.getContext().setAuthentication(null);
-        return "index";
+        return ResponseEntity.ok(new Result(true));
     }
 
     @PostMapping("/auth/restore")

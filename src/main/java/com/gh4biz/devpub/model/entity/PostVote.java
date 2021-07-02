@@ -13,10 +13,12 @@ public class PostVote {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; //id лайка/дизлайка
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
     private User user; //тот, кто поставил лайк / дизлайк
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+//    @JoinColumn(name = "post_id", nullable = false)
     private Post post; //пост, которому поставлен лайк / дизлайк
 
     private Date time; //дата и время лайка / дизлайка

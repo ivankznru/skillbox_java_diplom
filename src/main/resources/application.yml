@@ -1,17 +1,16 @@
 spring:
- jpa:
-  properties:
-   hibernate:
-    dialect: org.hibernate.dialect.MySQL55Dialect
-    ddl-auto: validate
-   show-sql: false
  datasource:
-#  url: jdbc:mysql://portal.baltalm.ru:3306/devpub?characterEncoding=utf8&useSSL=false&serverTimezone=Europe/Moscow
-  url: jdbc:${CLEARDB_DATABASE_URL:mysql://192.168.20.19:3306/devpub?characterEncoding=utf-8}
-
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  url: jdbc:mysql://portal.baltalm.ru:3306/devpub?characterEncoding=utf8&useSSL=false&serverTimezone=Europe/Moscow
+  #url: jdbc:${CLEARDB_DATABASE_URL:mysql://portal.baltalm.ru:3306/devpub?characterEncoding=utf8&useSSL=false&serverTimezone=Europe/Moscow
+#  url: jdbc:mysql://b5e9c4dd45ab9f:29dcf81a@eu-cdbr-west-01.cleardb.com/heroku_3e7f461e7375da0?useUnicode=true&characterEncoding=utf-8&reconnect=true
   username: skilluser
   password: testTEST667+667
-
+ jpa:
+  hibernate:
+   ddl-auto: validate
+  database-platform: org.hibernate.dialect.MySQL8Dialect
+  show-sql: false
 server:
  port: ${PORT:8080}
  tomcat:
@@ -33,10 +32,13 @@ blogUploadImageSizeLimit: 3145728
 
 blogUrl: https://devpub-gh4biz.herokuapp.com
 blogImageDBPathFolder: resources/static/img/
-blogImageRealPathFolder: src\main\resources\static\img\
+blogImageRealPathFolder: src/main/resources/static/img/
 
 blogAvatarHeight: 105
 blogAvatarWidth: 100
 
 blogEmailUser: noreplydevpub@gh4biz.ru
 blogEmailPassword: 76Ye%uk6
+my-app:
+ flyway:
+  license: FL019A6482637C6A2F5483D5F5606711A76EE7D783E2105BA9D1CB1E24B7685DFFF5D6F86640E680901F694046A643A926CAFBDC1239E93759F5C529A02C9089B7F336CC4DFAADAC8F055EDD8B87ECD7D96FDAFF6BB2B9F53C3FC99FC472A606056F0A5558847116B368F3E943700814CBE92F464B593A9FAE043F32067FB87BA4B7D333EDA8150A812DA30A4414B6F55C6D7F570894BDC8ACDDA1D2FA4376C3381591234F7AC5EF7A5ADFF18155DB805413864A38F3F6B3C40D45EAAB9E1F9054542C1B5A9D941C02128C5A589808EA731B398F1302C2F158B1B6B9AEFFAA1E9FCA3580BC98BFECF8FE8F1B0D2502C11E9EA022678C64A4C531B7B8072387C80888

@@ -3,6 +3,7 @@ package com.gh4biz.devpub.service;
 import com.gh4biz.devpub.model.RegErrors;
 import com.gh4biz.devpub.model.RegisterResult;
 import com.gh4biz.devpub.model.entity.CaptchaCode;
+import com.gh4biz.devpub.model.entity.Image;
 import com.gh4biz.devpub.model.entity.User;
 import com.gh4biz.devpub.model.request.ChangePasswordForm;
 import com.gh4biz.devpub.model.request.ProfileEditForm;
@@ -10,6 +11,7 @@ import com.gh4biz.devpub.model.request.RegisterForm;
 import com.gh4biz.devpub.model.response.ProfileEdit;
 import com.gh4biz.devpub.model.response.Result;
 import com.gh4biz.devpub.repo.CaptchaRepository;
+import com.gh4biz.devpub.repo.ImageRepository;
 import com.gh4biz.devpub.repo.UserRepository;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.io.FilenameUtils;
@@ -33,6 +35,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +50,7 @@ public class RegisterService {
     private final UserRepository userRepository;
     private final CaptchaRepository captchaRepository;
     private final AuthenticationManager authenticationManager;
+    private final ImageRepository imageRepository;
 
     @Value("${blogImageDBPathFolder}")
     private String blogImageDBPathFolder;
@@ -71,10 +75,12 @@ public class RegisterService {
 
     public RegisterService(UserRepository userRepository,
                            CaptchaRepository captchaRepository,
-                           AuthenticationManager authenticationManager) {
+                           AuthenticationManager authenticationManager,
+                           ImageRepository imageRepository) {
         this.userRepository = userRepository;
         this.captchaRepository = captchaRepository;
         this.authenticationManager = authenticationManager;
+        this.imageRepository = imageRepository;
     }
 
 
@@ -145,12 +151,7 @@ public class RegisterService {
                     new UsernamePasswordAuthenticationToken(form.getEmail(), user.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-
         user.setName(form.getName());
-
-//        if (form.getPassword() != null)
-//            user.setName(form.getName());
-
         if (form.getPassword() != null)
             user.setPassword(
                     new BCryptPasswordEncoder().
@@ -186,14 +187,22 @@ public class RegisterService {
             bufferedImage = resizeImage(bufferedImage, BufferedImage.TYPE_INT_RGB);
         }
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String fileName = generateKey(file.getOriginalFilename()) + "." + extension;
-        String path = blogImageRealPathFolder + fileName;
-        String dbPath = blogImageDBPathFolder + fileName;
-
-        File outputFile = new File(path);
-        ImageIO.write(bufferedImage, extension, outputFile);
-        user.setPhoto(File.separator + dbPath);
+        byte[] bytes = toByteArray(bufferedImage, extension);
+        String fileName = "/resources/static/img/" + generateKey(file.getOriginalFilename()) + "." + extension;
+        com.gh4biz.devpub.model.entity.Image image = new Image();
+        image.setImage(bytes);
+        image.setImageName(fileName);
+        imageRepository.save(image);
+        user.setPhoto(fileName);
         userRepository.save(user);
+    }
+
+    public static byte[] toByteArray(BufferedImage bi, String format)
+            throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(bi, format, baos);
+        byte[] bytes = baos.toByteArray();
+        return bytes;
     }
 
     private String generateKey(String name) {

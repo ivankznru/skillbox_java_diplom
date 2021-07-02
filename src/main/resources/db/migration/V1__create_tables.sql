@@ -14,7 +14,7 @@ CREATE TABLE `users`
 CREATE TABLE `posts`
 (
     `id`           int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    `is_active`    tinyint         NOT NULL,
+    `is_active`    int             NOT NULL,
     `status`       ENUM ('NEW', 'ACCEPTED', 'DECLINED'),
     `moderator_id` int,
     `user_id`      int             NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `posts`
     `title`        varchar(255)    NOT NULL,
     `text`         text            NOT NULL,
     `view_count`   int             NOT NULL,
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on DELETE cascade
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 );
 
 CREATE TABLE `post_votes`
@@ -32,8 +32,8 @@ CREATE TABLE `post_votes`
     `post_id` int             NOT NULL,
     `time`    datetime        NOT NULL,
     `value`   tinyint         NOT NULL,
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on delete cascade,
-    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
 );
 
 CREATE TABLE `tags`
@@ -47,8 +47,8 @@ CREATE TABLE `tag2post`
     `id`      int PRIMARY KEY NOT NULL AUTO_INCREMENT,
     `post_id` int,
     `tag_id`  int,
-    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade,
-    FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`) on DELETE cascade
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`),
+    FOREIGN KEY (`tag_id`) REFERENCES `tags` (`id`)
 );
 
 CREATE TABLE `post_comments`
@@ -58,10 +58,10 @@ CREATE TABLE `post_comments`
     `post_id`   int             NOT NULL,
     `user_id`   int             NOT NULL,
     `time`      datetime        NOT NULL,
-    `text`      text            NOT NULL,
-    FOREIGN KEY (`parent_id`) REFERENCES `post_comments` (`id`) on delete cascade,
-    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) on delete cascade,
-    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) on delete cascade
+    `text`      varchar(255)    NOT NULL,
+    FOREIGN KEY (`parent_id`) REFERENCES `post_comments` (`id`),
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 
 );
 

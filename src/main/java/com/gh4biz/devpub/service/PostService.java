@@ -6,6 +6,7 @@ import com.gh4biz.devpub.model.request.VoteForm;
 import com.gh4biz.devpub.model.request.PostEditForm;
 import com.gh4biz.devpub.model.response.*;
 import com.gh4biz.devpub.repo.*;
+import javassist.tools.web.BadHttpRequest;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,9 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.sound.midi.Soundbank;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -206,7 +210,11 @@ public class PostService {
     }
 
     public PostResponse getPostById(int postId, Principal principal) {
-        Post post = postRepository.findPostsById(postId);
+        Optional<Post> postOptional = postRepository.findPostById(postId);
+        if (postOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Пост не найден!");
+        }
+        Post post = postOptional.get();
         Optional<User> optionalUser = Optional.empty();
 
         if (principal != null) optionalUser = userRepository.findByEmail(principal.getName());
@@ -339,11 +347,14 @@ public class PostService {
         post.setStatus(status);
 
         postRepository.save(post);
+        //System.out.println(form.getTags().size());
         for (String tagName : form.getTags()) {
-            Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
-            Tag2Post tag2Post = optionalTag.isPresent() ?
-                    new Tag2Post(post, optionalTag.get()) :
-                    new Tag2Post(post, new Tag(tagName));
+
+            Optional<Tag> optionalTag = tagRepository.getAllByName(tagName);
+
+            System.out.println(optionalTag);
+
+            Tag2Post tag2Post = optionalTag.map(tag -> new Tag2Post(post, tag)).orElseGet(() -> new Tag2Post(post, new Tag(tagName)));
             tag2PostRepository.save(tag2Post);
         }
         return ResponseEntity.ok(new PostUpdateEditResponse(true));
@@ -371,7 +382,7 @@ public class PostService {
 
         if (tag2posts.isEmpty()) {
             for (String tagName : form.getTags()) {
-                Optional<Tag> optionalTag = tagRepository.findTagByName(tagName);
+                Optional<Tag> optionalTag = tagRepository.getAllByName(tagName);
                 Tag tag;
                 if (optionalTag.isEmpty()) {
                     tag = new Tag(tagName);
@@ -382,15 +393,21 @@ public class PostService {
                 tag2PostRepository.save(new Tag2Post(post, tag));
             }
         } else {
-            for (Tag2Post item : tag2posts) {
-                String tagName = item.getTag().getName();
-                if (!form.getTags().contains(tagName)){
-                    tag2PostRepository.delete(item);
+            for (Tag2Post tag2post : tag2posts) {
+                String tagName = tag2post.getTag().getName();
+                if (!form.getTags().contains(tagName)) {
+                    tag2PostRepository.delete(tag2post);
                 }
             }
-            for (String item : form.getTags()){
-                Optional<Tag> optionalTag = tagRepository.findTagByName(item);
-                Tag tag = optionalTag.orElseGet(() -> new Tag(item));
+            for (String item : form.getTags()) {
+                Optional<Tag> optionalTag = tagRepository.getAllByName(item);
+                Tag tag;
+                if (optionalTag.isEmpty()) {
+                    tag = new Tag(item);
+                    tagRepository.save(tag);
+                } else {
+                    tag = optionalTag.get();
+                }
                 addTag2Post(post, tag);
             }
         }
@@ -399,7 +416,7 @@ public class PostService {
 
     private void addTag2Post(Post post, Tag tag) {
         Optional<Tag2Post> tag2Post = tag2PostRepository.findTag2PostsByPostAndTag(post, tag);
-        if (tag2Post.isEmpty()){
+        if (tag2Post.isEmpty()) {
             Tag2Post t2p = new Tag2Post(post, tag);
             tag2PostRepository.save(t2p);
         }
@@ -470,7 +487,8 @@ public class PostService {
     }
 
     private boolean vote(int vote, VoteForm form, Principal principal) {
-        User user = userRepository.findByEmail(principal.getName()).get();
+        Optional<User> userOptional = userRepository.findByEmail(principal.getName());
+        User user = userOptional.get();
         Post post = postRepository.findPostsById(form.getPostId());
         Optional<PostVote> optionalPostVote = postVotesRepository.findByUserAndPost(user, post);
         if (optionalPostVote.isEmpty()) {
